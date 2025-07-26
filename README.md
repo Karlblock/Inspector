@@ -10,6 +10,8 @@ A specialized CLI tool designed for Hack The Box enumeration, analysis, and repo
 - 🛠️ **Extensible Modules**: Easy to add new enumeration techniques
 - 📝 **Note Management**: Integrated note-taking during enumeration
 - 🔄 **Session Management**: Save and resume enumeration sessions
+- 🌐 **Tor OSINT Module**: Defensive dark web research for threat intelligence
+- 🛡️ **Security Focused**: Built-in protections and compliance checks
 
 ## Installation
 
@@ -65,6 +67,11 @@ cyba-htb quick -t 10.10.10.100
 # Export findings to different formats
 cyba-htb report session_123 -f json -o findings.json
 cyba-htb report session_123 -f html -o report.html
+
+# Tor/Dark Web OSINT (defensive security research)
+cyba-htb tor-osint -t example.com --use-tor
+cyba-htb tor-osint -t example.com --check-hibp --check-shodan
+cyba-htb tor-osint -t example.com --executive-report --include-opsec
 ```
 
 ## Architecture
