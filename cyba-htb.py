@@ -39,9 +39,15 @@ class CybaHTB:
     def main(self):
         # Check if interactive mode requested
         if len(sys.argv) > 1 and sys.argv[1] == 'interactive':
-            from cli.interactive import main as interactive_main
-            interactive_main()
-            return
+            try:
+                from src.cli.interactive import main as interactive_main
+                interactive_main()
+                return
+            except ImportError:
+                # Try alternate import path
+                from cli.interactive import main as interactive_main
+                interactive_main()
+                return
             
         display_banner()
         parser = self.create_parser()

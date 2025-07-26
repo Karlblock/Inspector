@@ -1,0 +1,5 @@
+#!/bin/bash
+# Direct launcher for cyba-HTB interactive mode
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source $DIR/venv/bin/activate
+python3 $DIR/cyba-cli.py

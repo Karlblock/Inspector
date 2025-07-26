@@ -93,7 +93,9 @@ class EnumerationController:
         try:
             from integrations.platform_sync import PlatformSync
             sync = PlatformSync()
-            sync.sync_enumeration_progress(session_id, session, session.get('findings', {}))
+            session_data = self.session_manager.get_session(session_id)
+            if session_data:
+                sync.sync_enumeration_progress(session_id, session_data, session_data.get('findings', {}))
         except:
             pass
     

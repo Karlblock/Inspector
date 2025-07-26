@@ -44,6 +44,16 @@ class EnumerationProfiles:
                 'name': 'full',
                 'description': 'Complete enumeration with all modules',
                 'modules': ['nmap', 'web', 'smb', 'ssh', 'ftp', 'ldap', 'ssl', 'dns']
+            },
+            'defensive-osint': {
+                'name': 'defensive-osint',
+                'description': 'Defensive OSINT and threat intelligence gathering',
+                'modules': ['nmap', 'web', 'tor_osint']
+            },
+            'threat-intel': {
+                'name': 'threat-intel',
+                'description': 'Comprehensive threat intelligence with Tor research',
+                'modules': ['nmap', 'web', 'ssl', 'tor_osint']
             }
         }
     
