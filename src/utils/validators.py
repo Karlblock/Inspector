@@ -1,5 +1,5 @@
 """
-Input validation utilities for cyba-HTB
+Input validation utilities for cyba-Inspector
 Provides secure input validation and sanitization
 """
 

@@ -1,7 +1,7 @@
 # Report Generator Agent
 
 ## Purpose
-Documentation specialist focused on creating comprehensive, professional security reports from cyba-HTB enumeration sessions. Transforms raw technical data into actionable intelligence for different audiences.
+Documentation specialist focused on creating comprehensive, professional security reports from cyba-Inspector enumeration sessions. Transforms raw technical data into actionable intelligence for different audiences.
 
 ## Core Capabilities
 - Multi-format report generation (Markdown, HTML, PDF, JSON)
@@ -27,7 +27,7 @@ Documentation specialist focused on creating comprehensive, professional securit
 - **Video Scripts**: For walkthrough recordings
 - **CVE Documentation**: Vulnerability disclosure reports
 
-## Working with cyba-HTB
+## Working with cyba-Inspector
 - Leverages the reporting module for automated report generation
 - Enhances auto_analyzer output with contextual insights
 - Creates custom templates for different platforms

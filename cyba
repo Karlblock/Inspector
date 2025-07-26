@@ -1,9 +1,9 @@
 #!/bin/bash
-# cyba - Smart wrapper for cyba-HTB
+# cyba - Smart wrapper for cyba-Inspector
 
-# Get the directory where cyba-HTB is installed
+# Get the directory where cyba-Inspector is installed
 CYBA_DIR="$(dirname "$(readlink -f "$0")")"
-CYBA_SCRIPT="$CYBA_DIR/cyba-htb.py"
+CYBA_SCRIPT="$CYBA_DIR/cyba-inspector.py"
 
 # Function to show usage
 show_usage() {
@@ -48,7 +48,7 @@ case "$1" in
         fi
         ;;
     sessions|profiles)
-        # Pass through to cyba-htb
+        # Pass through to cyba-inspector
         python3 "$CYBA_SCRIPT" "$@"
         ;;
     *)
@@ -69,7 +69,7 @@ case "$1" in
             eval "$CMD"
             
             # Save session ID for quick report access
-            # This would need to be implemented in cyba-htb.py
+            # This would need to be implemented in cyba-inspector.py
         else
             echo "Error: Invalid IP address or command"
             show_usage

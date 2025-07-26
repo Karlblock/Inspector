@@ -51,7 +51,7 @@ class TorOSINTIntegrations:
         try:
             headers = {
                 'hibp-api-key': api_key,
-                'User-Agent': 'cyba-HTB-Security-Tool'
+                'User-Agent': 'cyba-Inspector-Security-Tool'
             }
             
             # Check domain breaches

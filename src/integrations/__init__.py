@@ -1,1 +1,1 @@
-# Integration modules for cyba-HTB
+# Integration modules for cyba-Inspector

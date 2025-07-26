@@ -460,7 +460,7 @@ class AlertNotificationSystem:
         async with aiohttp.ClientSession() as session:
             payload = {
                 'alert': alert,
-                'source': 'cyba-htb-tor-monitor',
+                'source': 'cyba-inspector-tor-monitor',
                 'timestamp': datetime.now().isoformat()
             }
             

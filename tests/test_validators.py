@@ -93,7 +93,7 @@ def test_command_sanitization():
 
 def main():
     """Run all tests"""
-    print("Running cyba-HTB validator tests...\n")
+    print("Running cyba-Inspector validator tests...\n")
     
     test_ip_validation()
     test_port_validation()

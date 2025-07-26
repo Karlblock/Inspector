@@ -1,1 +1,1 @@
-# Reporting module for cyba-HTB
+# Reporting module for cyba-Inspector

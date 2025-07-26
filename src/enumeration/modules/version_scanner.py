@@ -1,5 +1,5 @@
 """
-Version detection and vulnerability scanning module for cyba-HTB
+Version detection and vulnerability scanning module for cyba-Inspector
 """
 
 import subprocess

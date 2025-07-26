@@ -1,4 +1,4 @@
-# 🚀 Quick Start - cyba-HTB Interactive CLI
+# 🚀 Quick Start - cyba-Inspector Interactive CLI
 
 ## Installation
 ```bash
@@ -13,70 +13,70 @@
 
 ### 1. Set Target
 ```bash
-cyba-htb> target 10.10.10.10
+cyba-inspector> target 10.10.10.10
 Target set to: 10.10.10.10
 ```
 
 ### 2. Quick Scan
 ```bash
-cyba-htb> scan
+cyba-inspector> scan
 # Or with options:
-cyba-htb> scan -p 80,443,8080 -sV
+cyba-inspector> scan -p 80,443,8080 -sV
 ```
 
 ### 3. Run Enumeration
 ```bash
 # Interactive wizard
-cyba-htb> enum
+cyba-inspector> enum
 
 # Direct profile
-cyba-htb> enum web-app
+cyba-inspector> enum web-app
 ```
 
 ### 4. Session Management
 ```bash
 # List sessions
-cyba-htb> session list
+cyba-inspector> session list
 
 # Create new session
-cyba-htb> session new
+cyba-inspector> session new
 
 # Load session
-cyba-htb> session load abc12345
+cyba-inspector> session load abc12345
 
 # Save current session
-cyba-htb> session save
+cyba-inspector> session save
 ```
 
 ### 5. Generate Report
 ```bash
 # Markdown report
-cyba-htb> report markdown
+cyba-inspector> report markdown
 
 # HTML report to file
-cyba-htb> report html /tmp/report.html
+cyba-inspector> report html /tmp/report.html
 ```
 
 ## Example Workflow
 ```bash
-cyba-htb> target 10.10.10.100
-cyba-htb> scan -p 1-10000
-cyba-htb> enum web-app
-cyba-htb> report markdown
-cyba-htb> exit
+cyba-inspector> target 10.10.10.100
+cyba-inspector> scan -p 1-10000
+cyba-inspector> enum web-app
+cyba-inspector> report markdown
+cyba-inspector> exit
 ```
 
 ## Tips
 - Use TAB for command completion
-- Command history saved in ~/.cyba_htb_history
+- Command history saved in ~/.cyba_inspector_history
 - Type 'help <command>' for detailed help
 - Sessions auto-save when auto_save is enabled
 
 ## Debugging
 ```bash
 # Enable debug mode
-cyba-htb> set debug true
+cyba-inspector> set debug true
 
 # Show current settings
-cyba-htb> show
+cyba-inspector> show
 ```

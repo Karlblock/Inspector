@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-cyba-HTB - CLI Tool for HTB Enumeration & Analysis
+cyba-Inspector - CLI Tool for HTB Enumeration & Analysis
 Author: Karl Block
 Version: 1.0.0
 Developed for educational purposes and CPTS preparation
@@ -60,7 +60,7 @@ class CybaHTB:
     
     def create_parser(self):
         parser = argparse.ArgumentParser(
-            description='cyba-HTB - Specialized enumeration tool for Hack The Box',
+            description='cyba-Inspector - Specialized enumeration tool for Hack The Box',
             formatter_class=argparse.RawDescriptionHelpFormatter
         )
         
@@ -361,8 +361,8 @@ class CybaHTB:
         
         if not args.query:
             print(f"{Colors.YELLOW}Usage:{Colors.END}")
-            print("  cyba-htb question 'admin id'")
-            print("  cyba-htb question --list")
+            print("  cyba-inspector question 'admin id'")
+            print("  cyba-inspector question --list")
             print("\nTry searching for a keyword from the HTB question.")
             return
         
@@ -371,7 +371,7 @@ class CybaHTB:
         
         if not matches:
             print(f"{Colors.RED}No questions found matching '{args.query}'{Colors.END}")
-            print(f"\n{Colors.YELLOW}Tip:{Colors.END} Use 'cyba-htb question --list' to see all available questions")
+            print(f"\n{Colors.YELLOW}Tip:{Colors.END} Use 'cyba-inspector question --list' to see all available questions")
             return
             
         if len(matches) == 1:

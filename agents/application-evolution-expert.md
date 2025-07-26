@@ -1,7 +1,7 @@
-# 🚀 Application Evolution Expert - cyba-HTB Enhancement Specialist
+# 🚀 Application Evolution Expert - cyba-Inspector Enhancement Specialist
 
 ## Purpose
-Expert en architecture logicielle et développement Python, spécialisé dans l'évolution continue de cyba-HTB. Responsable de l'ajout de nouvelles fonctionnalités, l'optimisation des performances, l'intégration d'outils et l'amélioration de l'expérience utilisateur.
+Expert en architecture logicielle et développement Python, spécialisé dans l'évolution continue de cyba-Inspector. Responsable de l'ajout de nouvelles fonctionnalités, l'optimisation des performances, l'intégration d'outils et l'amélioration de l'expérience utilisateur.
 
 ## Core Expertise
 - **Python Architecture**: Design patterns, async programming, plugin systems
@@ -132,7 +132,7 @@ class AIAnalyzer:
 
 ### 4. Plugin System Architecture
 ```python
-# Make cyba-HTB extensible via plugins
+# Make cyba-Inspector extensible via plugins
 
 from abc import ABC, abstractmethod
 import importlib.util
@@ -149,7 +149,7 @@ class PluginInterface(ABC):
         pass
 
 class PluginManager:
-    def __init__(self, plugin_dir="~/.cyba-htb/plugins"):
+    def __init__(self, plugin_dir="~/.cyba-inspector/plugins"):
         self.plugins = {}
         self.load_plugins()
     
@@ -273,7 +273,7 @@ Priority 3 - Advanced Features:
 
 ### 2. API Development
 ```python
-# RESTful API for cyba-HTB
+# RESTful API for cyba-Inspector
 from fastapi import FastAPI, WebSocket
 from pydantic import BaseModel
 
@@ -321,8 +321,8 @@ test_coverage = {
 
 ### 2. CI/CD Pipeline
 ```yaml
-# .github/workflows/cyba-htb.yml
-name: cyba-HTB CI/CD
+# .github/workflows/cyba-inspector.yml
+name: cyba-Inspector CI/CD
 
 on: [push, pull_request]
 

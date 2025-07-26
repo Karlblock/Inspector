@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-cyba-HTB is a specialized CLI tool for Hack The Box enumeration, analysis, and reporting. It provides structured enumeration workflows based on machine types and services.
+cyba-Inspector is a specialized CLI tool for Hack The Box enumeration, analysis, and reporting. It provides structured enumeration workflows based on machine types and services.
 
 ## Development Commands
 
@@ -16,8 +16,8 @@ pip install -r requirements.txt
 # Install system dependencies (Debian/Ubuntu)
 sudo apt install nmap gobuster smbclient smbmap whatweb dirb
 
-# Create global symlink (after moving to /home/user1/cyba-HTB)
-sudo ln -sf /home/user1/cyba-HTB/cyba-htb.py /usr/local/bin/cyba-htb
+# Create global symlink (after moving to /home/user1/cyba-Inspector)
+sudo ln -sf /home/user1/cyba-Inspector/cyba-inspector.py /usr/local/bin/cyba-inspector
 ```
 
 ### Testing
@@ -32,29 +32,29 @@ python3 tests/test_integration.py
 ./tests/test_workflow.sh
 
 # Test specific functionality
-cyba-htb enum -t 127.0.0.1 -n test --ports 80,443
+cyba-inspector enum -t 127.0.0.1 -n test --ports 80,443
 ```
 
 ### Common Development Tasks
 ```bash
 # Quick scan a target
-cyba-htb quick -t <IP>
+cyba-inspector quick -t <IP>
 
 # Full enumeration with profile
-cyba-htb enum -t <IP> -n <machine_name> -p <profile>
+cyba-inspector enum -t <IP> -n <machine_name> -p <profile>
 
 # Generate report from session
-cyba-htb report <session_id> -f markdown
+cyba-inspector report <session_id> -f markdown
 
 # List available profiles
-cyba-htb profiles list
+cyba-inspector profiles list
 ```
 
 ## Architecture Overview
 
 ### Core Components
 
-1. **Main Entry Point** (`cyba-htb.py`)
+1. **Main Entry Point** (`cyba-inspector.py`)
    - Handles CLI argument parsing
    - Routes commands to appropriate handlers
    - Manages input validation and error codes
@@ -66,7 +66,7 @@ cyba-htb profiles list
    - All modules inherit from `BaseModule` for consistent interface
 
 3. **Session Management** (`src/utils/session.py`)
-   - Stores enumeration state in `~/.cyba-htb/sessions/`
+   - Stores enumeration state in `~/.cyba-inspector/sessions/`
    - JSON-based persistence for resumable sessions
    - Tracks findings per module
 

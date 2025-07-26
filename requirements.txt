@@ -1,4 +1,4 @@
-# cyba-HTB Python Dependencies
+# cyba-Inspector Python Dependencies
 # Core dependencies for HTB enumeration tool
 
 # Console output and formatting

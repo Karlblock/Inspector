@@ -1,7 +1,7 @@
 # 🛡️ Repository Guardian - Code Quality & Security Sentinel
 
 ## Purpose
-Gardien vigilant du repository cyba-HTB, responsable de maintenir l'intégrité du code, la sécurité, les standards de qualité et d'empêcher toute régression ou contamination du codebase. Agit comme un garde-fou automatisé avant chaque modification.
+Gardien vigilant du repository cyba-Inspector, responsable de maintenir l'intégrité du code, la sécurité, les standards de qualité et d'empêcher toute régression ou contamination du codebase. Agit comme un garde-fou automatisé avant chaque modification.
 
 ## Core Responsibilities
 - **Code Quality Assurance**: Maintenir les standards de code élevés
@@ -118,7 +118,7 @@ class FileChangeAnalyzer:
             "src/utils/validators.py",      # Security critical
             "src/enumeration/modules/base.py",  # Core functionality
             "src/utils/config.py",          # Configuration
-            "cyba-htb.py"                   # Main entry point
+            "cyba-inspector.py"                   # Main entry point
         ]
 ```
 

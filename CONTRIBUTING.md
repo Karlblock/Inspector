@@ -1,6 +1,6 @@
-# Contributing to cyba-HTB
+# Contributing to cyba-Inspector
 
-Thank you for your interest in contributing to cyba-HTB! This tool is designed to help the Hack The Box community with structured enumeration and learning.
+Thank you for your interest in contributing to cyba-Inspector! This tool is designed to help the Hack The Box community with structured enumeration and learning.
 
 ## How to Contribute
 

@@ -9,7 +9,7 @@ from pathlib import Path
 
 class CVEDatabase:
     def __init__(self):
-        self.cache_dir = Path.home() / '.cyba-htb' / 'cve_cache'
+        self.cache_dir = Path.home() / '.cyba-inspector' / 'cve_cache'
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
         # Common CVE patterns for HTB

@@ -44,31 +44,31 @@ The Tor OSINT module provides defensive security research capabilities for ident
 ### Basic Usage
 ```bash
 # Basic domain research (clearnet only)
-cyba-htb tor-osint -t example.com
+cyba-inspector tor-osint -t example.com
 
 # Research with Tor enabled
-cyba-htb tor-osint -t example.com --use-tor
+cyba-inspector tor-osint -t example.com --use-tor
 
 # Custom keywords
-cyba-htb tor-osint -t example.com -k password database credential leak
+cyba-inspector tor-osint -t example.com -k password database credential leak
 
 # Full scan with integrations
-cyba-htb tor-osint -t example.com --use-tor --check-hibp --check-shodan
+cyba-inspector tor-osint -t example.com --use-tor --check-hibp --check-shodan
 ```
 
 ### Advanced Options
 ```bash
 # Generate executive report
-cyba-htb tor-osint -t example.com --executive-report
+cyba-inspector tor-osint -t example.com --executive-report
 
 # Enable alerting for high-risk findings
-cyba-htb tor-osint -t example.com --slack-alerts --create-tickets
+cyba-inspector tor-osint -t example.com --slack-alerts --create-tickets
 
 # Export to STIX format
-cyba-htb tor-osint -t example.com --export-stix
+cyba-inspector tor-osint -t example.com --export-stix
 
 # Include OPSEC guidelines
-cyba-htb tor-osint -t example.com --include-opsec
+cyba-inspector tor-osint -t example.com --include-opsec
 ```
 
 ## Configuration
@@ -223,7 +223,7 @@ This module is designed for defensive security research only:
 ## Support
 
 For issues or questions:
-1. Check the logs in `~/.cyba-htb/logs/`
+1. Check the logs in `~/.cyba-inspector/logs/`
 2. Review the safety report for compliance issues
 3. Ensure all dependencies are installed
 4. Verify Tor and API configurations
