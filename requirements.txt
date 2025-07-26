@@ -1,0 +1,27 @@
+# cyba-HTB Python Dependencies
+# Core dependencies for HTB enumeration tool
+
+# Console output and formatting
+colorama>=0.4.6
+
+# HTTP requests for API integration
+requests>=2.28.1
+
+# HTML parsing for web enumeration
+beautifulsoup4>=4.11.2
+
+# Table formatting for reports
+tabulate>=0.9.0
+
+# JSON handling (included in stdlib, but listed for clarity)
+# json - built-in
+
+# Path handling (included in stdlib)
+# pathlib - built-in
+
+# Process execution (included in stdlib)
+# subprocess - built-in
+
+# Optional dependencies for enhanced features
+# python-dotenv>=1.0.0  # For environment variable management
+# pyyaml>=6.0  # For YAML configuration support
