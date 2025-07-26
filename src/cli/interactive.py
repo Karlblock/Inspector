@@ -61,12 +61,6 @@ class CybaHTBShell(cmd2.Cmd):
         self.active_sessions = {}
         
         # CLI settings
-        self.settable.update({
-            'auto_save': cmd2.Settable('auto_save', bool, 'Auto-save session after each command', self),
-            'color_output': cmd2.Settable('color_output', bool, 'Enable colored output', self),
-            'verbose': cmd2.Settable('verbose', bool, 'Enable verbose output', self),
-        })
-        
         self.auto_save = True
         self.color_output = True
         self.verbose = False
@@ -134,16 +128,17 @@ class CybaHTBShell(cmd2.Cmd):
                 self.current_target,
                 self.current_session or "temp",
                 "/tmp/cyba-htb",
+                quick=True,  # Use quick scan for interactive mode
                 **nmap_opts
             )
             
             progress.remove_task(task)
             
         # Display results
-        if result.get('open_ports'):
-            self._display_scan_results(result)
+        if result and result.get('quick_scan', {}).get('stdout'):
+            self._display_nmap_output(result['quick_scan']['stdout'])
         else:
-            self.poutput("No open ports found.")
+            self.poutput("No scan results or scan failed.")
     
     def do_enum(self, args):
         """Run enumeration with interactive wizard
@@ -227,6 +222,34 @@ class CybaHTBShell(cmd2.Cmd):
             
         self.console.print(table)
     
+    def _display_nmap_output(self, output):
+        """Display raw nmap output with basic parsing"""
+        # Extract key information
+        lines = output.split('\n')
+        ports_section = False
+        
+        self.poutput(f"\n{Colors.CYAN}Scan Results for {self.current_target}{Colors.RESET}")
+        self.poutput("-" * 50)
+        
+        for line in lines:
+            if "PORT" in line and "STATE" in line:
+                ports_section = True
+                self.poutput(f"{Colors.YELLOW}{line}{Colors.RESET}")
+            elif ports_section and line.strip() and not line.startswith("Service Info"):
+                if "/tcp" in line or "/udp" in line:
+                    parts = line.split()
+                    if len(parts) >= 3:
+                        port = parts[0]
+                        state = parts[1]
+                        service = ' '.join(parts[2:])
+                        if "open" in state:
+                            self.poutput(f"{Colors.GREEN}{port:10} {state:10} {service}{Colors.RESET}")
+                        else:
+                            self.poutput(f"{Colors.RED}{port:10} {state:10} {service}{Colors.RESET}")
+            elif "Service Info" in line:
+                self.poutput(f"\n{Colors.BLUE}{line}{Colors.RESET}")
+                ports_section = False
+    
     def _show_enumeration_wizard(self):
         """Interactive enumeration wizard"""
         self.poutput(f"\n{Colors.CYAN}Enumeration Wizard{Colors.RESET}")
@@ -269,10 +292,14 @@ class CybaHTBShell(cmd2.Cmd):
         ) as progress:
             task = progress.add_task(f"Running {profile_name} enumeration...", total=None)
             
-            self.enum_controller.run_enumeration(
-                self.current_target,
-                self.current_session,
-                profile_name
+            # Get machine name from session or use default
+            machine_name = f"machine_{self.current_target.replace('.', '_')}"
+            
+            self.enum_controller.start_enumeration(
+                session_id=self.current_session,
+                target=self.current_target,
+                name=machine_name,
+                profile=profile_name
             )
             
             progress.remove_task(task)
@@ -282,37 +309,42 @@ class CybaHTBShell(cmd2.Cmd):
     
     def _list_sessions(self):
         """List all available sessions"""
-        sessions = self.session_manager.list_sessions()
+        # Get all session files
+        session_files = list(self.session_manager.sessions_dir.glob("*.json"))
         
-        if not sessions:
+        if not session_files:
             self.poutput("No sessions found.")
             return
             
         table = Table(title="Available Sessions")
         table.add_column("Session ID", style="cyan")
         table.add_column("Target", style="yellow")
+        table.add_column("Name", style="blue")
         table.add_column("Created", style="green")
-        table.add_column("Modules Run", style="magenta")
+        table.add_column("Status", style="magenta")
         
-        for session in sessions:
-            data = self.session_manager.load_session(session)
+        for session_file in session_files:
+            session_id = session_file.stem
+            data = self.session_manager.get_session(session_id)
             if data:
                 table.add_row(
-                    session,
+                    session_id,
                     data.get('target', 'N/A'),
-                    data.get('created_at', 'N/A'),
-                    str(len(data.get('modules_completed', [])))
+                    data.get('name', 'N/A'),
+                    data.get('created', 'N/A')[:19],  # Just date and time
+                    data.get('status', 'N/A')
                 )
                 
         self.console.print(table)
     
     def _load_session(self, session_id):
         """Load a specific session"""
-        data = self.session_manager.load_session(session_id)
+        data = self.session_manager.get_session(session_id)
         if data:
             self.current_session = session_id
             self.current_target = data.get('target')
             self.poutput(f"Session loaded: {Colors.GREEN}{session_id}{Colors.RESET}")
+            self.poutput(f"Target: {self.current_target}")
         else:
             self.perror(f"Session not found: {session_id}")
     
