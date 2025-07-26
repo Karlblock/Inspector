@@ -105,3 +105,28 @@ class InputValidator:
         # Remove ANSI escape sequences
         ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
         return ansi_escape.sub('', text)
+    
+    @staticmethod
+    def validate_domain(domain):
+        """Validate domain name"""
+        # Basic domain validation pattern
+        domain_pattern = re.compile(
+            r'^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*'
+            r'[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'
+        )
+        
+        # Check length
+        if not domain or len(domain) > 253:
+            return False
+            
+        # Check pattern
+        if not domain_pattern.match(domain):
+            return False
+            
+        # Check each label
+        labels = domain.split('.')
+        for label in labels:
+            if not label or len(label) > 63:
+                return False
+                
+        return True

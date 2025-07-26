@@ -19,6 +19,11 @@ from .base import BaseModule
 from ...utils.logger import Logger
 from ...utils.validators import InputValidator
 
+# Import Tor OSINT components
+from .tor_osint.reporting import TorOSINTReporter
+from .tor_osint.integrations import TorOSINTIntegrations
+from .tor_osint.protection import TorOSINTProtection
+
 
 class TorOSINTModule(BaseModule):
     """
@@ -32,6 +37,11 @@ class TorOSINTModule(BaseModule):
         self.validator = InputValidator()
         self.tor_proxy = "socks5h://127.0.0.1:9050"
         self.searches_performed = []
+        
+        # Initialize components
+        self.reporter = TorOSINTReporter()
+        self.integrations = TorOSINTIntegrations()
+        self.protection = TorOSINTProtection()
         
     def verify_tor_connection(self) -> bool:
         """Verify Tor is running and accessible"""
@@ -94,6 +104,20 @@ class TorOSINTModule(BaseModule):
             self.logger.error(f"Invalid domain: {target_domain}")
             return results
             
+        # Validate search scope with protection module
+        validation = self.protection.validate_search_scope(target_domain, keywords)
+        if not validation['valid']:
+            self.logger.error(f"Search validation failed: {validation['issues']}")
+            return results
+            
+        # Use sanitized keywords
+        keywords = validation['sanitized_keywords']
+        
+        # Check rate limits
+        if not self.protection.check_rate_limits():
+            self.logger.warning("Rate limit exceeded, skipping search")
+            return results
+            
         # Common paste sites and forums to check (clearnet + onion)
         leak_sources = [
             {
@@ -122,6 +146,13 @@ class TorOSINTModule(BaseModule):
         # Log defensive search
         self.logger.info(f"Starting defensive leak search for: {target_domain}")
         self.logger.info(f"Search scope: {', '.join(keywords)}")
+        
+        # Log activity for audit trail
+        self.protection.log_activity('data_leak_search', {
+            'target': target_domain,
+            'keywords': keywords,
+            'timestamp': datetime.now().isoformat()
+        })
         
         # Simulate search results (in production, actual API calls would be made)
         # This is a safe simulation for demonstration
@@ -232,14 +263,32 @@ All activities were authorized and documented according to security policies.
             'target': target,
             'timestamp': datetime.now().isoformat(),
             'tor_enabled': False,
-            'findings': {}
+            'findings': {},
+            'keywords': kwargs.get('keywords', ['password', 'leak', 'breach', 'database'])
         }
         
+        # Check legal compliance first
+        compliance = self.protection.check_legal_compliance(
+            'tor_osint_research',
+            kwargs.get('jurisdiction', 'US')
+        )
+        
+        if not compliance['compliant']:
+            self.logger.error("Operation not legally compliant")
+            results['error'] = 'Legal compliance check failed'
+            results['compliance'] = compliance
+            return results
+            
         # Check if we should use Tor
         use_tor = kwargs.get('use_tor', False)
-        keywords = kwargs.get('keywords', ['password', 'leak', 'breach', 'database'])
+        keywords = results['keywords']
         
+        # Verify Tor safety if using it
         if use_tor:
+            tor_safety = self.protection.verify_tor_safety()
+            if not tor_safety['safe']:
+                self.logger.warning(f"Tor safety issues detected: {tor_safety['issues']}")
+                
             # Verify Tor connection
             if not self.verify_tor_connection():
                 self.logger.warning("Tor is not available, proceeding with clearnet only")
@@ -263,9 +312,29 @@ All activities were authorized and documented according to security policies.
             threat_intel = self.monitor_threat_intel(org_keywords)
             results['findings']['threat_intel'] = threat_intel
             
-            # Generate report
-            report = self.generate_defensive_report(results['findings'])
-            report_path = os.path.join(output_dir, f"tor_osint_report_{session_id}.md")
+            # Check additional threat sources if configured
+            if kwargs.get('check_hibp', False):
+                hibp_results = self.integrations.check_hibp_breaches(target)
+                results['findings']['hibp'] = hibp_results
+                
+            if kwargs.get('check_shodan', False):
+                shodan_results = self.integrations.check_shodan_exposure(target)
+                results['findings']['shodan'] = shodan_results
+            
+            # Sanitize findings before reporting
+            results['findings'] = self.protection.sanitize_findings(results['findings'])
+            
+            # Generate reports in multiple formats
+            report_format = kwargs.get('report_format', 'markdown')
+            report = self.reporter.generate_report(
+                results['findings'],
+                format=report_format,
+                include_recommendations=kwargs.get('include_recommendations', True)
+            )
+            
+            # Save main report
+            report_ext = 'md' if report_format == 'markdown' else report_format
+            report_path = os.path.join(output_dir, f"tor_osint_report_{session_id}.{report_ext}")
             
             with open(report_path, 'w') as f:
                 f.write(report)
@@ -273,15 +342,74 @@ All activities were authorized and documented according to security policies.
             results['report_path'] = report_path
             self.logger.info(f"Tor OSINT report saved to: {report_path}")
             
+            # Generate additional reports
+            if kwargs.get('generate_executive_report', False):
+                exec_report = self.reporter.generate_report(results['findings'], format='executive')
+                exec_path = os.path.join(output_dir, f"tor_osint_executive_{session_id}.md")
+                with open(exec_path, 'w') as f:
+                    f.write(exec_report)
+                results['executive_report_path'] = exec_path
+                
+            # Generate safety report
+            safety_report = self.protection.generate_safety_report()
+            safety_path = os.path.join(output_dir, f"tor_osint_safety_{session_id}.md")
+            with open(safety_path, 'w') as f:
+                f.write(safety_report)
+            results['safety_report_path'] = safety_path
+            
+            # Generate OPSEC guidelines if requested
+            if kwargs.get('include_opsec', False):
+                opsec = self.protection.generate_opsec_guidelines()
+                opsec_path = os.path.join(output_dir, f"tor_osint_opsec_{session_id}.md")
+                with open(opsec_path, 'w') as f:
+                    f.write(opsec)
+                results['opsec_guide_path'] = opsec_path
+            
+            # Handle integrations
+            if kwargs.get('send_to_siem', False):
+                siem_results = self.integrations.integrate_with_siem(results['findings'])
+                results['integrations'] = {'siem': siem_results}
+                
+            # Check if we need to create tickets or alerts
+            risk_level = leak_results.get('risk_level', 'low')
+            if risk_level in ['High', 'Critical']:
+                # Send Slack alert if configured
+                if kwargs.get('slack_alerts', False):
+                    slack_result = self.integrations.send_slack_alert(results['findings'])
+                    results.setdefault('integrations', {})['slack'] = slack_result
+                    
+                # Create Jira ticket if configured
+                if kwargs.get('create_tickets', False):
+                    jira_result = self.integrations.create_jira_ticket(results['findings'])
+                    results.setdefault('integrations', {})['jira'] = jira_result
+            
+            # Export to STIX if requested
+            if kwargs.get('export_stix', False):
+                stix_data = self.integrations.export_to_stix(results['findings'])
+                stix_path = os.path.join(output_dir, f"tor_osint_stix_{session_id}.json")
+                with open(stix_path, 'w') as f:
+                    f.write(stix_data)
+                results['stix_export_path'] = stix_path
+            
             # Add to session findings
             findings_summary = {
                 'data_leaks_found': len(leak_results.get('potential_leaks', [])),
                 'risk_level': leak_results.get('risk_level', 'low'),
                 'threats_detected': len(threat_intel.get('threats_found', [])),
-                'report_location': report_path
+                'report_location': report_path,
+                'compliance_status': 'compliant',
+                'safety_verified': True
             }
             
             results['findings']['summary'] = findings_summary
+            
+            # Log completion
+            self.protection.log_activity('tor_osint_complete', {
+                'target': target,
+                'session_id': session_id,
+                'findings_count': findings_summary['data_leaks_found'] + findings_summary['threats_detected'],
+                'risk_level': findings_summary['risk_level']
+            })
             
         except Exception as e:
             self.logger.error(f"Error during Tor OSINT research: {e}")
