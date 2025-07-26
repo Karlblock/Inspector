@@ -293,6 +293,26 @@ class OnionDiscoveryEngine:
         
         return v2_addresses.union(v3_addresses)
     
+    def _parse_darksearch(self, response_text: str) -> Set[str]:
+        """Parse DarkSearch API JSON response"""
+        onions = set()
+        try:
+            data = json.loads(response_text)
+            if 'data' in data:
+                for result in data['data']:
+                    # Extract onion from link
+                    link = result.get('link', '')
+                    found = self.onion_pattern.findall(link)
+                    onions.update(found)
+                    
+                    # Also check description
+                    desc = result.get('description', '')
+                    found = self.onion_pattern.findall(desc)
+                    onions.update(found)
+        except:
+            pass
+        return onions
+    
     def _classify_onion(self, onion_address: str, organization: str) -> Dict:
         """Classify an onion address based on various factors"""
         classification = {

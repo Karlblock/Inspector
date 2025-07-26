@@ -160,11 +160,17 @@ class TorOSINTModule(BaseModule):
         
         # Perform real searches
         session = requests.Session()
-        if self.tor_enabled:
+        tor_enabled = results.get('tor_enabled', False)
+        if tor_enabled:
             session.proxies = {
                 'http': self.tor_proxy,
                 'https': self.tor_proxy
             }
+        
+        # Check for known official .onion addresses first
+        known_onions = self._check_known_onions(target_domain)
+        if known_onions:
+            results['potential_leaks'].extend(known_onions)
         
         # Search Ahmia for .onion sites mentioning the domain
         ahmia_results = self._search_ahmia(session, target_domain, keywords)
@@ -429,6 +435,220 @@ All activities were authorized and documented according to security policies.
         except Exception as e:
             print(f"{Colors.RED}[-] Error during Tor OSINT research: {e}{Colors.END}")
             results['error'] = str(e)
+            
+        return results
+    
+    def _search_ahmia(self, session: requests.Session, domain: str, keywords: List[str]) -> List[Dict]:
+        """Search Ahmia for .onion sites mentioning the domain"""
+        results = []
+        base_url = "https://ahmia.fi/search/"
+        
+        try:
+            # Recherche ciblée sur les vrais risques
+            # Au lieu de chercher juste le domaine, chercher des patterns spécifiques
+            risk_patterns = [
+                f'"{domain}" database leak',
+                f'"{domain}" password dump',
+                f'"{domain}" breach',
+                f'"{domain}" hacked',
+                f'site:{domain.split(".")[0]}*.onion',  # Chercher les clones
+                f'"{domain}" vulnerability',
+                f'"{domain}" exposed data'
+            ]
+            
+            # Limiter à 3-4 recherches pour éviter le rate limiting
+            search_terms = risk_patterns[:4]
+            
+            for term in search_terms:
+                print(f"{Colors.CYAN}[*] Searching Ahmia for: {term}{Colors.END}")
+                
+                params = {'q': term}
+                response = session.get(base_url, params=params, timeout=30)
+                
+                if response.status_code == 200:
+                    # Parse HTML results
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    
+                    # Find result items
+                    for result in soup.find_all('li', class_='result'):
+                        onion_link = result.find('cite')
+                        title = result.find('h4')
+                        description = result.find('p')
+                        
+                        if onion_link and '.onion' in onion_link.text:
+                            # Analyser la pertinence
+                            title_text = title.text.lower() if title else ''
+                            desc_text = description.text.lower() if description else ''
+                            onion_addr = onion_link.text.strip()
+                            
+                            # Filtrer les résultats non pertinents
+                            relevance_score = 0
+                            severity = 'info'
+                            
+                            # Mots-clés de haute pertinence
+                            high_relevance = ['leak', 'breach', 'dump', 'database', 'password', 'hack', 
+                                            'stolen', 'exposed', 'vulnerability', 'compromised', 'credential']
+                            
+                            # Mots-clés de basse pertinence (liens, annuaires, etc.)
+                            low_relevance = ['directory', 'links', 'index', 'list of', 'collection', 
+                                           'bookmark', 'forum', 'wiki', 'onion list']
+                            
+                            # Calculer le score de pertinence
+                            for keyword in high_relevance:
+                                if keyword in title_text or keyword in desc_text:
+                                    relevance_score += 2
+                                    severity = 'high'
+                            
+                            for keyword in low_relevance:
+                                if keyword in title_text or keyword in desc_text:
+                                    relevance_score -= 1
+                            
+                            # Vérifier si c'est un clone/phishing potentiel
+                            if domain.split('.')[0] in onion_addr:
+                                relevance_score += 3
+                                severity = 'critical'
+                                details = f"Potential phishing/clone site: {onion_addr}"
+                            else:
+                                details = f"Found on: {onion_addr} - {title_text[:100]}"
+                            
+                            # Ne garder que les résultats pertinents
+                            if relevance_score > 0 or severity == 'critical':
+                                results.append({
+                                    'source': 'Ahmia',
+                                    'type': 'onion_mention' if severity != 'critical' else 'potential_phishing',
+                                    'details': details,
+                                    'title': title.text if title else 'Unknown',
+                                    'description': description.text[:200] if description else '',
+                                    'onion_address': onion_addr,
+                                    'severity': severity,
+                                    'relevance_score': relevance_score,
+                                    'recommendation': 'Investigate this .onion site for potential data exposure' if severity != 'critical' else 'URGENT: Investigate potential phishing site'
+                                })
+                
+                # Rate limiting
+                time.sleep(2)
+                
+        except Exception as e:
+            print(f"{Colors.YELLOW}[!] Ahmia search error: {e}{Colors.END}")
+            
+        return results
+    
+    def _check_known_onions(self, domain: str) -> List[Dict]:
+        """Check for known official .onion addresses"""
+        results = []
+        
+        # Base de données des .onion officiels connus
+        known_onions = {
+            'facebook.com': {
+                'official': 'facebookcorewwwi.onion',
+                'v3': 'facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion'
+            },
+            'nytimes.com': {
+                'official': 'nytimes3xbfgragh.onion',
+                'v3': 'ej3kv4ebuugcmuwxctx5ic7zxh73rnxt42soi3tdneu2c2em55thufqd.onion'
+            },
+            'bbc.com': {
+                'official': 'bbcnewsv2vjtpsuy.onion'
+            },
+            'protonmail.com': {
+                'official': 'protonirockerxow.onion'
+            },
+            'duckduckgo.com': {
+                'official': '3g2upl4pq6kufc4m.onion',
+                'v3': 'duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion'
+            }
+        }
+        
+        # Vérifier si le domaine a un .onion officiel
+        base_domain = domain.lower()
+        if base_domain in known_onions:
+            for onion_type, onion_addr in known_onions[base_domain].items():
+                results.append({
+                    'source': 'Known Official Onion',
+                    'type': 'official_onion',
+                    'details': f"Official {onion_type} Tor address for {domain}",
+                    'onion_address': onion_addr,
+                    'severity': 'info',
+                    'recommendation': 'This is the legitimate Tor address. Be aware of clones/phishing sites.'
+                })
+        
+        return results
+    
+    def _check_hibp_domain(self, session: requests.Session, domain: str) -> List[Dict]:
+        """Check Have I Been Pwned for domain breaches"""
+        results = []
+        
+        try:
+            # HIBP requires User-Agent
+            headers = {
+                'User-Agent': 'cyba-Inspector-Security-Tool',
+                'Accept': 'application/json'
+            }
+            
+            # Check domain breaches
+            print(f"{Colors.CYAN}[*] Checking HIBP for {domain} breaches{Colors.END}")
+            
+            # Note: Full API requires paid key. Using public breach list
+            url = f"https://haveibeenpwned.com/api/v3/breaches"
+            response = session.get(url, headers=headers, timeout=30)
+            
+            if response.status_code == 200:
+                breaches = response.json()
+                domain_breaches = []
+                
+                # Search for domain in breach data
+                for breach in breaches:
+                    if domain.lower() in breach.get('Domain', '').lower() or \
+                       domain.lower() in breach.get('Title', '').lower() or \
+                       domain.lower() in breach.get('Description', '').lower():
+                        domain_breaches.append(breach)
+                
+                for breach in domain_breaches:
+                    results.append({
+                        'source': 'Have I Been Pwned',
+                        'type': 'data_breach',
+                        'details': f"{breach['Title']}: {breach['Description'][:200]}...",
+                        'breach_date': breach['BreachDate'],
+                        'compromised_data': ', '.join(breach['DataClasses']),
+                        'affected_accounts': breach['PwnCount'],
+                        'severity': 'high' if breach['PwnCount'] > 100000 else 'medium',
+                        'recommendation': 'Notify affected users and enforce password resets'
+                    })
+                    
+        except Exception as e:
+            print(f"{Colors.YELLOW}[!] HIBP check error: {e}{Colors.END}")
+            
+        return results
+    
+    def _search_paste_sites(self, session: requests.Session, domain: str, keywords: List[str]) -> List[Dict]:
+        """Search paste sites for exposed data"""
+        results = []
+        
+        # Using Google dorks for paste sites (ethical and legal)
+        paste_sites = [
+            'site:pastebin.com',
+            'site:ghostbin.com',
+            'site:dpaste.com'
+        ]
+        
+        try:
+            for site in paste_sites:
+                search_query = f"{site} \"{domain}\""
+                print(f"{Colors.CYAN}[*] Searching pastes: {search_query}{Colors.END}")
+                
+                # Note: In production, you'd use Google Custom Search API
+                # For now, we'll note that manual verification is needed
+                results.append({
+                    'source': 'Paste Site Search',
+                    'type': 'manual_check_required',
+                    'details': f"Manual search recommended: {search_query}",
+                    'severity': 'info',
+                    'recommendation': f"Manually check Google for: {search_query}"
+                })
+                
+        except Exception as e:
+            print(f"{Colors.YELLOW}[!] Paste search error: {e}{Colors.END}")
             
         return results
     
