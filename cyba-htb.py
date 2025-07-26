@@ -37,6 +37,12 @@ class CybaHTB:
         self.htb_questions = HTBQuestions()
         
     def main(self):
+        # Check if interactive mode requested
+        if len(sys.argv) > 1 and sys.argv[1] == 'interactive':
+            from cli.interactive import main as interactive_main
+            interactive_main()
+            return
+            
         display_banner()
         parser = self.create_parser()
         args = parser.parse_args()
