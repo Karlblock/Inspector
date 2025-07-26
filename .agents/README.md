@@ -60,6 +60,16 @@ Architecture and development specialist focused on enhancing cyba-HTB with cutti
 - Integrating new tools
 - Designing architecture improvements
 
+### 🛡️ [Repository Guardian](./repository-guardian.md)
+Code quality and security sentinel that protects the repository integrity and prevents regressions or vulnerabilities.
+
+**Use when:**
+- Before committing changes
+- Reviewing pull requests
+- Checking security compliance
+- Validating architecture patterns
+- Monitoring code quality metrics
+
 ## Discipline Specialists
 
 See [disciplines/README.md](./disciplines/README.md) for the complete list of 12 specialized agents covering:
