@@ -2,7 +2,7 @@
 
 ## 🛡️ Overview
 
-The Tor OSINT module for cyba-HTB provides defensive security capabilities for monitoring and protecting your organization from dark web threats. This module focuses exclusively on legal and ethical research activities.
+The Tor OSINT module for cyba-Inspector provides defensive security capabilities for monitoring and protecting your organization from dark web threats. This module focuses exclusively on legal and ethical research activities.
 
 ## 🚀 Quick Start
 
@@ -29,13 +29,13 @@ curl --socks5-hostname 127.0.0.1:9050 https://check.torproject.org/api/ip
 
 ### Basic Usage
 
-#### Using with cyba-HTB profiles:
+#### Using with cyba-Inspector profiles:
 ```bash
 # Defensive OSINT profile
-cyba-htb enum -t example.com -n defensive-scan -p defensive-osint
+cyba-inspector enum -t example.com -n defensive-scan -p defensive-osint
 
 # Threat intelligence profile
-cyba-htb enum -t example.com -n threat-scan -p threat-intel --tor
+cyba-inspector enum -t example.com -n threat-scan -p threat-intel --tor
 ```
 
 #### Direct module usage:
@@ -270,7 +270,7 @@ TARGETS="company.com subsidiary.com"
 KEYWORDS="password database leak breach"
 
 for target in $TARGETS; do
-    cyba-htb enum -t $target \
+    cyba-inspector enum -t $target \
         -n "daily-$(date +%Y%m%d)" \
         -p defensive-osint \
         --tor \

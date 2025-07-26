@@ -1,5 +1,5 @@
 #!/bin/bash
-# Activate cyba-HTB environment
+# Activate cyba-Inspector environment
 source $(dirname "$0")/venv/bin/activate
-echo "✅ cyba-HTB environment activated!"
-echo "Run: python3 cyba-htb.py interactive"
+echo "✅ cyba-Inspector environment activated!"
+echo "Run: python3 cyba-inspector.py interactive"

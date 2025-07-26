@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# cyba-HTB Installation Script
+# cyba-Inspector Installation Script
 # Author: Karl Block
 # Version: 1.0.0
 
 echo "========================================"
-echo "     cyba-HTB Installation Script       "
+echo "     cyba-Inspector Installation Script       "
 echo "========================================"
 
 # Colors
@@ -23,18 +23,18 @@ fi
 # Get the directory of the script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-echo -e "${GREEN}[+] Installing cyba-HTB...${NC}"
+echo -e "${GREEN}[+] Installing cyba-Inspector...${NC}"
 
 # Make the main script executable
-chmod +x "$SCRIPT_DIR/cyba-htb.py"
+chmod +x "$SCRIPT_DIR/cyba-inspector.py"
 
 # Create symlink
 echo -e "${GREEN}[+] Creating symlink...${NC}"
-sudo ln -sf "$SCRIPT_DIR/cyba-htb.py" /usr/local/bin/cyba-htb
+sudo ln -sf "$SCRIPT_DIR/cyba-inspector.py" /usr/local/bin/cyba-inspector
 
 # Create config directory
 echo -e "${GREEN}[+] Creating configuration directory...${NC}"
-mkdir -p ~/.cyba-htb/{sessions,config}
+mkdir -p ~/.cyba-inspector/{sessions,config}
 
 # Check for required tools
 echo -e "${GREEN}[+] Checking dependencies...${NC}"
@@ -70,9 +70,9 @@ fi
 
 echo -e "${GREEN}[+] Installation complete!${NC}"
 echo ""
-echo "Usage: cyba-htb --help"
+echo "Usage: cyba-inspector --help"
 echo ""
 echo "Quick start:"
-echo "  cyba-htb enum -t <target_ip> -n <machine_name>"
-echo "  cyba-htb quick -t <target_ip>"
+echo "  cyba-inspector enum -t <target_ip> -n <machine_name>"
+echo "  cyba-inspector quick -t <target_ip>"
 echo ""

@@ -1,5 +1,5 @@
 """
-Configuration management for cyba-HTB
+Configuration management for cyba-Inspector
 Handles environment variables and secure configuration
 """
 
@@ -11,7 +11,7 @@ class Config:
     """Centralized configuration management"""
     
     def __init__(self):
-        self.config_dir = Path.home() / '.cyba-htb' / 'config'
+        self.config_dir = Path.home() / '.cyba-inspector' / 'config'
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.config_file = self.config_dir / 'config.json'
         self._load_config()
@@ -22,7 +22,7 @@ class Config:
         self.config = {
             'api_url': os.getenv('CYBA_API_URL', 'http://localhost:8080/api'),
             'api_key': os.getenv('CYBA_API_KEY', None),
-            'session_dir': os.getenv('CYBA_SESSION_DIR', str(Path.home() / '.cyba-htb' / 'sessions')),
+            'session_dir': os.getenv('CYBA_SESSION_DIR', str(Path.home() / '.cyba-inspector' / 'sessions')),
             'timeout_short': int(os.getenv('CYBA_TIMEOUT_SHORT', '120')),
             'timeout_long': int(os.getenv('CYBA_TIMEOUT_LONG', '600')),
             'max_threads': int(os.getenv('CYBA_MAX_THREADS', '5')),

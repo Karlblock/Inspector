@@ -1,5 +1,5 @@
 """
-Automatic analysis of enumeration results for cyba-HTB
+Automatic analysis of enumeration results for cyba-Inspector
 """
 
 import re

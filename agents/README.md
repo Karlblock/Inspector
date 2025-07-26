@@ -1,8 +1,8 @@
-# cyba-HTB Specialized Agents
+# cyba-Inspector Specialized Agents
 
-This directory contains specialized AI agents designed to assist with different aspects of Hack The Box enumeration and security testing using the cyba-HTB tool.
+This directory contains specialized AI agents designed to assist with different aspects of Hack The Box enumeration and security testing using the cyba-Inspector tool.
 
-## Core cyba-HTB Agents
+## Core cyba-Inspector Agents
 
 ### 🔍 [Enumeration Specialist](./enumeration-specialist.md)
 Expert in reconnaissance and service discovery. Helps identify attack surfaces and gather intelligence on target machines.
@@ -32,7 +32,7 @@ Documentation specialist for creating professional security reports and HTB writ
 - Documenting methodology and tools
 
 ### 💻 [Module Developer](./module-developer.md)
-Software engineering expert for extending cyba-HTB with new features and enumeration modules.
+Software engineering expert for extending cyba-Inspector with new features and enumeration modules.
 
 **Use when:**
 - Adding new enumeration modules
@@ -52,7 +52,7 @@ Master coordinator that intelligently manages all specialist agents for complex 
 - Optimizing multi-agent workflows
 
 ### 🚀 [Application Evolution Expert](./application-evolution-expert.md)
-Architecture and development specialist focused on enhancing cyba-HTB with cutting-edge features and optimizations.
+Architecture and development specialist focused on enhancing cyba-Inspector with cutting-edge features and optimizations.
 
 **Use when:**
 - Planning new features
@@ -87,7 +87,7 @@ See [disciplines/README.md](./disciplines/README.md) for the complete list of 12
 ## How to Use These Agents
 
 1. **Choose the Right Agent**: Select based on your current task
-2. **Provide Context**: Share relevant cyba-HTB output or code
+2. **Provide Context**: Share relevant cyba-Inspector output or code
 3. **Ask Specific Questions**: Be clear about what help you need
 4. **Iterate**: Agents can help refine and improve results
 
@@ -103,10 +103,10 @@ See [disciplines/README.md](./disciplines/README.md) for the complete list of 12
 2. **Enumeration Specialist**: Validate enumeration approach
 3. **Module Developer**: Implement and test the module
 
-## Integration with cyba-HTB
+## Integration with cyba-Inspector
 
-These agents are designed to work seamlessly with the cyba-HTB tool:
+These agents are designed to work seamlessly with the cyba-Inspector tool:
 - They understand the tool's architecture and modules
-- They can interpret cyba-HTB output and session data
+- They can interpret cyba-Inspector output and session data
 - They follow the project's security best practices
 - They maintain consistency with existing code patterns

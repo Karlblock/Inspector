@@ -67,7 +67,7 @@ go build -o onionscan
 #!/usr/bin/env python3
 """
 Defensive Onion Discovery Tool
-Pour cyba-HTB - Usage légal uniquement
+Pour cyba-Inspector - Usage légal uniquement
 """
 
 import re
@@ -234,18 +234,18 @@ HiddenServicePort 80 127.0.0.1:8080
 3. **Téléchargement de contenu douteux**
 4. **Partage d'adresses illicites**
 
-## 🚀 Intégration avec cyba-HTB
+## 🚀 Intégration avec cyba-Inspector
 
 ```bash
 # Ajouter la découverte d'onions à votre scan
-cyba-htb enum -t company.com \
+cyba-inspector enum -t company.com \
   -p defensive-osint \
   --tor \
   --discover-onions \
   --keywords "company brand product"
 
 # Monitoring continu
-cyba-htb monitor \
+cyba-inspector monitor \
   --tor-discovery \
   --interval 3600 \
   --alert-new-onions

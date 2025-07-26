@@ -1,5 +1,5 @@
 """
-Platform synchronization module for cyba-HTB
+Platform synchronization module for cyba-Inspector
 Auto-documents progress to HTB Platform
 """
 
@@ -265,7 +265,7 @@ class PlatformSync:
         """Fallback to file storage when API unavailable"""
         
         # Store in local JSON files
-        platform_dir = Path.home() / '.cyba-htb' / 'platform'
+        platform_dir = Path.home() / '.cyba-inspector' / 'platform'
         platform_dir.mkdir(parents=True, exist_ok=True)
         
         # Simple file-based implementation

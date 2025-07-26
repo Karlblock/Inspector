@@ -1,5 +1,5 @@
 """
-Interactive CLI for cyba-HTB
+Interactive CLI for cyba-Inspector
 Module Developer Agent Implementation
 """
 
@@ -28,24 +28,24 @@ from src.reporting.generator import ReportGenerator
 
 
 class CybaHTBShell(cmd2.Cmd):
-    """Enhanced interactive shell for cyba-HTB"""
+    """Enhanced interactive shell for cyba-Inspector"""
     
     intro = f"""
 {Colors.CYAN}╔════════════════════════════════════════════╗
-║       cyba-HTB Interactive Mode v2.0       ║
+║       cyba-Inspector Interactive Mode v2.0       ║
 ║                                            ║
 ║  Type 'help' for available commands        ║
 ║  Tab completion and history available      ║
 ╚════════════════════════════════════════════╝{Colors.RESET}
     """
     
-    prompt = f"{Colors.GREEN}cyba-htb>{Colors.RESET} "
+    prompt = f"{Colors.GREEN}cyba-inspector>{Colors.RESET} "
     
     def __init__(self):
         # Initialize cmd2 with history file
         super().__init__(
-            persistent_history_file=os.path.expanduser("~/.cyba_htb_history"),
-            startup_script=os.path.expanduser("~/.cyba_htbrc")
+            persistent_history_file=os.path.expanduser("~/.cyba_inspector_history"),
+            startup_script=os.path.expanduser("~/.cyba_inspectorrc")
         )
         
         # Initialize components
@@ -127,7 +127,7 @@ class CybaHTBShell(cmd2.Cmd):
             result = nmap.run(
                 self.current_target,
                 self.current_session or "temp",
-                "/tmp/cyba-htb",
+                "/tmp/cyba-inspector",
                 quick=True,  # Use quick scan for interactive mode
                 **nmap_opts
             )

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Direct launcher for cyba-HTB interactive mode
+Direct launcher for cyba-Inspector interactive mode
 """
 
 import sys

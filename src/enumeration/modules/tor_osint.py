@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tor OSINT Module for cyba-HTB
+Tor OSINT Module for cyba-Inspector
 Defensive security research on Tor network for threat intelligence
 """
 

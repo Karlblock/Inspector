@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Integration tests for cyba-HTB modules
+Integration tests for cyba-Inspector modules
 Tests module loading, dependencies, and basic functionality
 """
 
@@ -163,7 +163,7 @@ def test_validator_integration():
 
 def main():
     """Run all integration tests"""
-    print("Running cyba-HTB integration tests...\n")
+    print("Running cyba-Inspector integration tests...\n")
     
     tests = [
         test_module_imports,

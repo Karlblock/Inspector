@@ -1,7 +1,7 @@
 #!/bin/bash
-# Setup script for cyba-HTB with virtual environment
+# Setup script for cyba-Inspector with virtual environment
 
-echo "🚀 Setting up cyba-HTB environment..."
+echo "🚀 Setting up cyba-Inspector environment..."
 
 # Create virtual environment
 echo "📦 Creating virtual environment..."
@@ -21,10 +21,10 @@ pip install -r requirements.txt
 # Create activation script
 cat > activate_cyba.sh << 'EOF'
 #!/bin/bash
-# Activate cyba-HTB environment
+# Activate cyba-Inspector environment
 source $(dirname "$0")/venv/bin/activate
-echo "✅ cyba-HTB environment activated!"
-echo "Run: python3 cyba-htb.py interactive"
+echo "✅ cyba-Inspector environment activated!"
+echo "Run: python3 cyba-inspector.py interactive"
 EOF
 
 chmod +x activate_cyba.sh
@@ -32,10 +32,10 @@ chmod +x activate_cyba.sh
 # Create direct launcher for interactive mode
 cat > cyba-interactive << 'EOF'
 #!/bin/bash
-# Direct launcher for cyba-HTB interactive mode
+# Direct launcher for cyba-Inspector interactive mode
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $DIR/venv/bin/activate
-python3 $DIR/cyba-htb.py interactive
+python3 $DIR/cyba-inspector.py interactive
 EOF
 
 chmod +x cyba-interactive
@@ -43,9 +43,9 @@ chmod +x cyba-interactive
 echo ""
 echo "✅ Setup complete!"
 echo ""
-echo "To use cyba-HTB:"
+echo "To use cyba-Inspector:"
 echo "1. Activate environment: source venv/bin/activate"
-echo "2. Run interactive mode: python3 cyba-htb.py interactive"
+echo "2. Run interactive mode: python3 cyba-inspector.py interactive"
 echo ""
 echo "Or use the direct launcher:"
 echo "./cyba-interactive"

@@ -1,1 +1,1 @@
-# Utils module for cyba-HTB
+# Utils module for cyba-Inspector

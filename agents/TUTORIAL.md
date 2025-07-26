@@ -178,7 +178,7 @@ Next: @agent:next-specialist should check [specific areas]
 
 ```markdown
 # Éditer le fichier de l'agent
-nano /home/user1/cyba-HTB/.agents/disciplines/[agent-name].md
+nano /home/user1/cyba-Inspector/.agents/disciplines/[agent-name].md
 
 # Structure d'ajout
 ## New Technique/Tool

@@ -1,8 +1,8 @@
-# cyba-HTB Test Report
+# cyba-Inspector Test Report
 
 ## Executive Summary
 
-Comprehensive testing has been performed on cyba-HTB to validate its functionality, security, and readiness for community release. The tool demonstrates strong reliability with proper error handling and security measures.
+Comprehensive testing has been performed on cyba-Inspector to validate its functionality, security, and readiness for community release. The tool demonstrates strong reliability with proper error handling and security measures.
 
 ## Test Coverage
 
@@ -13,12 +13,12 @@ Comprehensive testing has been performed on cyba-HTB to validate its functionali
 - Dependency verification
 
 ### 2. Core Commands ✅
-- `cyba-htb --help` - Help system
-- `cyba-htb enum` - Main enumeration functionality
-- `cyba-htb quick` - Quick scan mode
-- `cyba-htb profiles` - Profile management
-- `cyba-htb sessions` - Session management
-- `cyba-htb report` - Report generation
+- `cyba-inspector --help` - Help system
+- `cyba-inspector enum` - Main enumeration functionality
+- `cyba-inspector quick` - Quick scan mode
+- `cyba-inspector profiles` - Profile management
+- `cyba-inspector sessions` - Session management
+- `cyba-inspector report` - Report generation
 
 ### 3. Input Validation ✅
 - **IP Address Validation**: Properly rejects invalid IPs (999.999.999.999)
@@ -128,7 +128,7 @@ All modules load successfully:
 
 ## Conclusion
 
-**cyba-HTB is ready for community release.** The tool demonstrates:
+**cyba-Inspector is ready for community release.** The tool demonstrates:
 - Robust error handling and input validation
 - Secure command execution and configuration management
 - Modular, extensible architecture
