@@ -11,21 +11,21 @@ from typing import Dict, List, Optional
 import hashlib
 from jinja2 import Template
 
-from ....utils.logger import Logger
+
 
 
 class TorOSINTReporter:
     """Generate comprehensive reports from Tor OSINT findings"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.report_formats = ['markdown', 'html', 'json', 'executive']
         
     def generate_report(self, findings: Dict, format: str = 'markdown', 
                        include_recommendations: bool = True) -> str:
         """Generate report in specified format"""
         if format not in self.report_formats:
-            self.logger.warning(f"Unknown format {format}, using markdown")
+            print(f"Unknown format {format}, using markdown")
             format = 'markdown'
             
         if format == 'markdown':

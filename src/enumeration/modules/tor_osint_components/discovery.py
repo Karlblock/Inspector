@@ -14,8 +14,8 @@ from bs4 import BeautifulSoup
 import Levenshtein
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from ....utils.logger import Logger
-from ....utils.validators import InputValidator
+
+from utils.validators import InputValidator
 
 
 class OnionDiscoveryEngine:
@@ -24,7 +24,7 @@ class OnionDiscoveryEngine:
     """
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.validator = InputValidator()
         self.session = self._create_tor_session()
         
@@ -90,7 +90,7 @@ class OnionDiscoveryEngine:
         """
         Discover onion addresses potentially related to the organization
         """
-        self.logger.info(f"Starting onion discovery for: {organization}")
+        print(f"Starting onion discovery for: {organization}")
         
         discoveries = {
             'timestamp': datetime.now().isoformat(),
@@ -135,9 +135,9 @@ class OnionDiscoveryEngine:
                 try:
                     onions = future.result()
                     all_onions.update(onions)
-                    self.logger.info(f"Found {len(onions)} onions from {engine_name} for '{term}'")
+                    print(f"Found {len(onions)} onions from {engine_name} for '{term}'")
                 except Exception as e:
-                    self.logger.error(f"Error searching {engine_name}: {e}")
+                    print(f"Error searching {engine_name}: {e}")
         
         discoveries['statistics']['total_found'] = len(all_onions)
         discoveries['statistics']['search_engines_used'] = list(self.search_engines.keys())
@@ -153,7 +153,7 @@ class OnionDiscoveryEngine:
         
         # Deep search if requested
         if deep_search:
-            self.logger.info("Performing deep search via link analysis")
+            print("Performing deep search via link analysis")
             deep_results = self._deep_link_analysis(all_onions, organization)
             discoveries['deep_search_results'] = deep_results
         
@@ -260,7 +260,7 @@ class OnionDiscoveryEngine:
                 onions.update(found_onions)
             
         except Exception as e:
-            self.logger.error(f"Error searching {engine_name}: {e}")
+            print(f"Error searching {engine_name}: {e}")
         
         return onions
     
@@ -386,7 +386,7 @@ class OnionDiscoveryEngine:
                     
                 except Exception as e:
                     deep_results['error_count'] += 1
-                    self.logger.error(f"Error crawling {source_onion}: {e}")
+                    print(f"Error crawling {source_onion}: {e}")
         
         return deep_results
     
@@ -413,7 +413,7 @@ class OnionDiscoveryEngine:
                 links.update(text_onions)
         
         except Exception as e:
-            self.logger.debug(f"Error crawling {onion_address}: {e}")
+            print(f"Error crawling {onion_address}: {e}")
         
         return links
     

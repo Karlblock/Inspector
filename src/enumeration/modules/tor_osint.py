@@ -15,14 +15,14 @@ from typing import Dict, List, Optional, Tuple
 import requests
 from urllib.parse import urlparse
 
-from .base import BaseModule
-from ...utils.logger import Logger
-from ...utils.validators import InputValidator
+from enumeration.modules.base import BaseModule
+from utils.validators import InputValidator
+from utils.colors import Colors
 
 # Import Tor OSINT components
-from .tor_osint.reporting import TorOSINTReporter
-from .tor_osint.integrations import TorOSINTIntegrations
-from .tor_osint.protection import TorOSINTProtection
+from enumeration.modules.tor_osint_components.reporting import TorOSINTReporter
+from enumeration.modules.tor_osint_components.integrations import TorOSINTIntegrations
+from enumeration.modules.tor_osint_components.protection import TorOSINTProtection
 
 
 class TorOSINTModule(BaseModule):
@@ -32,8 +32,8 @@ class TorOSINTModule(BaseModule):
     """
     
     def __init__(self):
-        super().__init__('tor_osint')
-        self.logger = Logger(__name__)
+        super().__init__()
+        self.name = 'tor_osint'
         self.validator = InputValidator()
         self.tor_proxy = "socks5h://127.0.0.1:9050"
         self.searches_performed = []
@@ -50,7 +50,7 @@ class TorOSINTModule(BaseModule):
             result = subprocess.run(['systemctl', 'is-active', 'tor'], 
                                   capture_output=True, text=True)
             if result.stdout.strip() != 'active':
-                self.logger.warning("Tor service is not active")
+                print(f"{Colors.YELLOW}[!] Tor service is not active{Colors.END}")
                 return False
                 
             # Test SOCKS connection
@@ -61,11 +61,11 @@ class TorOSINTModule(BaseModule):
                 test_socket.close()
                 return True
             except:
-                self.logger.error("Cannot connect to Tor SOCKS proxy on port 9050")
+                print(f"{Colors.RED}[-] Cannot connect to Tor SOCKS proxy on port 9050{Colors.END}")
                 return False
                 
         except Exception as e:
-            self.logger.error(f"Error verifying Tor connection: {e}")
+            print(f"{Colors.RED}[-] Error verifying Tor connection: {e}{Colors.END}")
             return False
     
     def check_tor_circuit(self) -> Optional[str]:
@@ -84,7 +84,7 @@ class TorOSINTModule(BaseModule):
                 data = response.json()
                 return data.get('IP', 'Unknown')
         except Exception as e:
-            self.logger.error(f"Error checking Tor circuit: {e}")
+            print(f"{Colors.RED}[-] Error checking Tor circuit: {e}{Colors.END}")
         return None
     
     def search_data_leaks(self, target_domain: str, keywords: List[str]) -> Dict:
@@ -101,13 +101,13 @@ class TorOSINTModule(BaseModule):
         
         # Validate domain
         if not self.validator.validate_domain(target_domain):
-            self.logger.error(f"Invalid domain: {target_domain}")
+            print(f"{Colors.RED}[-] Invalid domain: {target_domain}{Colors.END}")
             return results
             
         # Validate search scope with protection module
         validation = self.protection.validate_search_scope(target_domain, keywords)
         if not validation['valid']:
-            self.logger.error(f"Search validation failed: {validation['issues']}")
+            print(f"{Colors.RED}[-] Search validation failed: {validation['issues']}{Colors.END}")
             return results
             
         # Use sanitized keywords
@@ -115,25 +115,29 @@ class TorOSINTModule(BaseModule):
         
         # Check rate limits
         if not self.protection.check_rate_limits():
-            self.logger.warning("Rate limit exceeded, skipping search")
+            print(f"{Colors.YELLOW}[!] Rate limit exceeded, skipping search{Colors.END}")
             return results
             
-        # Common paste sites and forums to check (clearnet + onion)
+        # Real sources to check
         leak_sources = [
             {
-                'name': 'Pastebin Search',
-                'url': 'https://psbdmp.ws/api/v3/search/',
+                'name': 'Have I Been Pwned',
+                'url': 'https://haveibeenpwned.com/api/v3/breachedaccount/',
                 'type': 'api',
                 'requires_tor': False
             },
             {
-                'name': 'Have I Been Pwned',
-                'url': 'https://haveibeenpwned.com/api/v3/breaches',
-                'type': 'api', 
+                'name': 'IntelX Public',
+                'url': 'https://2.intelx.io/search',
+                'type': 'web',
                 'requires_tor': False
+            },
+            {
+                'name': 'Ahmia Search',
+                'url': 'https://ahmia.fi/search/',
+                'type': 'web',
+                'requires_tor': False  # Ahmia has clearnet access
             }
-            # Note: Actual onion addresses would be added here for production
-            # Only including clearnet sources for safety in this example
         ]
         
         # Build search terms
@@ -144,8 +148,8 @@ class TorOSINTModule(BaseModule):
         results['searched_terms'] = search_terms
         
         # Log defensive search
-        self.logger.info(f"Starting defensive leak search for: {target_domain}")
-        self.logger.info(f"Search scope: {', '.join(keywords)}")
+        print(f"{Colors.CYAN}[*] Starting defensive leak search for: {target_domain}{Colors.END}")
+        print(f"{Colors.CYAN}[*] Search scope: {', '.join(keywords)}{Colors.END}")
         
         # Log activity for audit trail
         self.protection.log_activity('data_leak_search', {
@@ -154,17 +158,28 @@ class TorOSINTModule(BaseModule):
             'timestamp': datetime.now().isoformat()
         })
         
-        # Simulate search results (in production, actual API calls would be made)
-        # This is a safe simulation for demonstration
-        results['potential_leaks'] = [
-            {
-                'source': 'Example Check',
-                'type': 'email_pattern',
-                'details': f"Found {target_domain} email pattern in public data",
-                'severity': 'medium',
-                'recommendation': 'Review and rotate credentials if needed'
+        # Perform real searches
+        session = requests.Session()
+        if self.tor_enabled:
+            session.proxies = {
+                'http': self.tor_proxy,
+                'https': self.tor_proxy
             }
-        ]
+        
+        # Search Ahmia for .onion sites mentioning the domain
+        ahmia_results = self._search_ahmia(session, target_domain, keywords)
+        if ahmia_results:
+            results['potential_leaks'].extend(ahmia_results)
+        
+        # Check HIBP for breaches (requires API key for full data)
+        hibp_results = self._check_hibp_domain(session, target_domain)
+        if hibp_results:
+            results['potential_leaks'].extend(hibp_results)
+        
+        # Search for exposed credentials on paste sites
+        paste_results = self._search_paste_sites(session, target_domain, keywords)
+        if paste_results:
+            results['potential_leaks'].extend(paste_results)
         
         # Assess risk level based on findings
         if results['potential_leaks']:
@@ -185,7 +200,7 @@ class TorOSINTModule(BaseModule):
         
         # In production, this would connect to threat intel feeds
         # For safety, we're only demonstrating the structure
-        self.logger.info(f"Monitoring for threats with keywords: {organization_keywords}")
+        print(f"{Colors.CYAN}[*] Monitoring for threats with keywords: {organization_keywords}{Colors.END}")
         
         return intel
     
@@ -256,7 +271,7 @@ All activities were authorized and documented according to security policies.
         Main execution method for the Tor OSINT module
         Performs defensive security research
         """
-        self.logger.info(f"Starting Tor OSINT module for target: {target}")
+        print(f"{Colors.CYAN}[*] Starting Tor OSINT module for target: {target}{Colors.END}")
         
         results = {
             'module': self.name,
@@ -274,7 +289,7 @@ All activities were authorized and documented according to security policies.
         )
         
         if not compliance['compliant']:
-            self.logger.error("Operation not legally compliant")
+            print(f"{Colors.RED}[-] Operation not legally compliant{Colors.END}")
             results['error'] = 'Legal compliance check failed'
             results['compliance'] = compliance
             return results
@@ -287,17 +302,17 @@ All activities were authorized and documented according to security policies.
         if use_tor:
             tor_safety = self.protection.verify_tor_safety()
             if not tor_safety['safe']:
-                self.logger.warning(f"Tor safety issues detected: {tor_safety['issues']}")
+                print(f"{Colors.YELLOW}[!] Tor safety issues detected: {tor_safety['issues']}{Colors.END}")
                 
             # Verify Tor connection
             if not self.verify_tor_connection():
-                self.logger.warning("Tor is not available, proceeding with clearnet only")
+                print(f"{Colors.YELLOW}[!] Tor is not available, proceeding with clearnet only{Colors.END}")
                 results['findings']['warning'] = "Tor not available, limited search performed"
             else:
                 # Check circuit
                 exit_ip = self.check_tor_circuit()
                 if exit_ip:
-                    self.logger.info(f"Tor circuit established, exit IP: {exit_ip}")
+                    print(f"{Colors.GREEN}[+] Tor circuit established, exit IP: {exit_ip}{Colors.END}")
                     results['tor_enabled'] = True
                     results['tor_exit_ip'] = exit_ip
         
@@ -340,7 +355,7 @@ All activities were authorized and documented according to security policies.
                 f.write(report)
                 
             results['report_path'] = report_path
-            self.logger.info(f"Tor OSINT report saved to: {report_path}")
+            print(f"{Colors.GREEN}[+] Tor OSINT report saved to: {report_path}{Colors.END}")
             
             # Generate additional reports
             if kwargs.get('generate_executive_report', False):
@@ -412,7 +427,7 @@ All activities were authorized and documented according to security policies.
             })
             
         except Exception as e:
-            self.logger.error(f"Error during Tor OSINT research: {e}")
+            print(f"{Colors.RED}[-] Error during Tor OSINT research: {e}{Colors.END}")
             results['error'] = str(e)
             
         return results
@@ -421,7 +436,7 @@ All activities were authorized and documented according to security policies.
         """Clean up any resources"""
         # Clear sensitive data from memory
         self.searches_performed = []
-        self.logger.info("Tor OSINT module cleanup completed")
+        print(f"{Colors.CYAN}[*] Tor OSINT module cleanup completed{Colors.END}")
 
 
 # Module registration

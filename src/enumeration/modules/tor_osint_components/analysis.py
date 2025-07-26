@@ -16,7 +16,7 @@ import ssdeep
 import tlsh
 from collections import Counter
 
-from ....utils.logger import Logger
+
 
 
 class OnionForensicsAnalyzer:
@@ -25,7 +25,7 @@ class OnionForensicsAnalyzer:
     """
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.session = None
         self.tor_proxy = "socks5h://127.0.0.1:9050"
         
@@ -101,7 +101,7 @@ class OnionForensicsAnalyzer:
         """
         Perform comprehensive forensic analysis of an onion site
         """
-        self.logger.info(f"Starting forensic analysis of {onion_address}")
+        print(f"Starting forensic analysis of {onion_address}")
         
         analysis_result = {
             'onion_address': onion_address,
@@ -143,7 +143,7 @@ class OnionForensicsAnalyzer:
             analysis_result['risk_score'] = self._calculate_risk_score(analysis_result)
             
         except Exception as e:
-            self.logger.error(f"Error analyzing {onion_address}: {e}")
+            print(f"Error analyzing {onion_address}: {e}")
             analysis_result['error'] = str(e)
             analysis_result['risk_score'] = 0.0
         
@@ -199,7 +199,7 @@ class OnionForensicsAnalyzer:
                     fingerprint['content_type'] = response.headers.get('Content-Type', 'unknown')
                     
         except Exception as e:
-            self.logger.debug(f"Fingerprinting error for {onion_address}: {e}")
+            print(f"Fingerprinting error for {onion_address}: {e}")
             fingerprint['error'] = str(e)
         
         return fingerprint
@@ -334,7 +334,7 @@ class OnionForensicsAnalyzer:
                     content_analysis['similarity_hash'] = ssdeep.hash(content)
                     
         except Exception as e:
-            self.logger.error(f"Content analysis error: {e}")
+            print(f"Content analysis error: {e}")
             content_analysis['error'] = str(e)
         
         return content_analysis
@@ -404,7 +404,7 @@ class OnionForensicsAnalyzer:
                 ) / len(network_analysis['response_times'])
             
         except Exception as e:
-            self.logger.error(f"Network analysis error: {e}")
+            print(f"Network analysis error: {e}")
             network_analysis['error'] = str(e)
         
         return network_analysis
@@ -496,7 +496,7 @@ class OnionForensicsAnalyzer:
                                 })
                     
         except Exception as e:
-            self.logger.error(f"Security assessment error: {e}")
+            print(f"Security assessment error: {e}")
             security_assessment['error'] = str(e)
         
         return security_assessment
@@ -619,7 +619,7 @@ class OnionForensicsAnalyzer:
             )
             
         except Exception as e:
-            self.logger.error(f"Deep analysis error: {e}")
+            print(f"Deep analysis error: {e}")
             deep_analysis['error'] = str(e)
         
         return deep_analysis
@@ -742,7 +742,7 @@ class OnionForensicsAnalyzer:
         # Cap at 1.0
         risk_score = min(risk_score, 1.0)
         
-        self.logger.info(f"Risk score: {risk_score}, factors: {factors}")
+        print(f"Risk score: {risk_score}, factors: {factors}")
         
         return risk_score
     

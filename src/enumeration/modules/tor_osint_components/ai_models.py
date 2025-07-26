@@ -15,14 +15,14 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-from ....utils.logger import Logger
+
 
 
 class PhishingMLModel:
     """ML model for detecting phishing sites"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2))
         self.classifier = RandomForestClassifier(n_estimators=100, random_state=42)
         self.is_trained = False
@@ -125,7 +125,7 @@ class ContentClassifier:
     """Classify content into categories"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         
         # Content categories and their indicators
         self.categories = {
@@ -207,7 +207,7 @@ class ThreatPredictor:
     """Predict future threats based on patterns"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.threat_patterns = []
         self.neural_net = MLPClassifier(
             hidden_layer_sizes=(100, 50),
@@ -357,7 +357,7 @@ class AIDefensiveTor:
     """Main AI defensive system coordinator"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.phishing_model = PhishingMLModel()
         self.content_classifier = ContentClassifier()
         self.threat_predictor = ThreatPredictor()
@@ -365,7 +365,7 @@ class AIDefensiveTor:
     def analyze_with_ai(self, content: str, url: str, 
                        metadata: Dict = None) -> Dict:
         """Perform comprehensive AI analysis"""
-        self.logger.info(f"Starting AI analysis for {url}")
+        print(f"Starting AI analysis for {url}")
         
         analysis = {
             'timestamp': datetime.now().isoformat(),
@@ -403,7 +403,7 @@ class AIDefensiveTor:
             analysis['recommendations'] = self._generate_ai_recommendations(analysis)
             
         except Exception as e:
-            self.logger.error(f"AI analysis error: {e}")
+            print(f"AI analysis error: {e}")
             analysis['error'] = str(e)
         
         return analysis
