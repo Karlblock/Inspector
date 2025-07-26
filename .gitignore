@@ -73,6 +73,7 @@ nmap_*.nmap
 results/
 output/
 logs/
+*.log
 
 # Sensitive data
 .env
