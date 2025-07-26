@@ -12,8 +12,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Set
 import ipaddress
 
-from ....utils.logger import Logger
-from ....utils.config import Config
+
+from utils.config import Config
 
 
 class TorOSINTProtection:
@@ -23,7 +23,7 @@ class TorOSINTProtection:
     """
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.config = Config()
         
         # Rate limiting
@@ -112,12 +112,12 @@ class TorOSINTProtection:
         ]
         
         if len(recent_minute) >= self.max_requests_per_minute:
-            self.logger.warning("Rate limit exceeded (per minute)")
+            print("Rate limit exceeded (per minute)")
             return False
             
         # Check hourly limit
         if len(self.request_history) >= self.max_requests_per_hour:
-            self.logger.warning("Rate limit exceeded (per hour)")
+            print("Rate limit exceeded (per hour)")
             return False
             
         # Add current request
@@ -145,7 +145,7 @@ class TorOSINTProtection:
             with open(log_file, 'a') as f:
                 f.write(f"{log_entry['timestamp']} - {activity_type}: {details}\n")
         except Exception as e:
-            self.logger.error(f"Failed to write activity log: {e}")
+            print(f"Failed to write activity log: {e}")
             
     def generate_legal_notice(self) -> str:
         """Generate legal notice for reports"""
@@ -234,7 +234,7 @@ of the authorized organization and protecting against threats.
                 safety_check['recommendations'].append('Configure DNS to use Tor (DNSPort 53)')
                 
         except Exception as e:
-            self.logger.error(f"Error checking DNS configuration: {e}")
+            print(f"Error checking DNS configuration: {e}")
             
         # Check Tor browser bundle usage
         if not os.path.exists('/etc/tor/torrc'):
@@ -341,7 +341,7 @@ OPERATIONAL SECURITY (OPSEC) GUIDELINES FOR TOR OSINT
         """Check if target is in authorized scope"""
         if not self.authorized_domains:
             # If no domains configured, allow but warn
-            self.logger.warning("No authorized domains configured - please set AUTHORIZED_DOMAINS")
+            print("No authorized domains configured - please set AUTHORIZED_DOMAINS")
             return True
             
         # Check exact match or subdomain

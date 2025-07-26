@@ -388,7 +388,7 @@ class CybaHTB:
             
     def tor_osint_handler(self, args):
         """Handle Tor OSINT command"""
-        from enumeration.modules.tor_osint import TorOSINTModule
+        from enumeration.modules import tor_osint as tor_osint_module
         
         # Validate domain
         if not InputValidator.validate_domain(args.target):
@@ -411,7 +411,7 @@ class CybaHTB:
         )
         
         # Initialize module
-        tor_module = TorOSINTModule()
+        tor_module = tor_osint_module.module
         
         # Prepare kwargs
         kwargs = {
@@ -474,7 +474,7 @@ class CybaHTB:
                         print(f"{Colors.GREEN}[+] SIEM events sent: {integrations['siem']['events_count']}{Colors.END}")
                 
                 # Update session with results
-                self.session_manager.update_session(session_id, 'tor_osint', results)
+                self.session_manager.update_session(session_id, {'tor_osint': results})
                 
         except Exception as e:
             print(f"{Colors.RED}[-] Error during Tor OSINT research: {e}{Colors.END}")

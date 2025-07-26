@@ -14,7 +14,7 @@ import queue
 from pathlib import Path
 import hashlib
 
-from ....utils.logger import Logger
+
 from .discovery import OnionDiscoveryEngine
 
 
@@ -129,7 +129,7 @@ class DataLeakMonitor(Monitor):
                                         alerts.append(alert)
                 
                 except Exception as e:
-                    self.logger.error(f"Error checking {site}: {e}")
+                    print(f"Error checking {site}: {e}")
         
         return alerts
     
@@ -197,7 +197,7 @@ class ThreatIntelMonitor(Monitor):
                         alerts.append(alert)
                         
             except Exception as e:
-                self.logger.error(f"Error checking forum {forum}: {e}")
+                print(f"Error checking forum {forum}: {e}")
         
         return alerts
     
@@ -280,7 +280,7 @@ class TorMonitoringSystem:
     """
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.monitors = {
             'brand_abuse': BrandAbuseMonitor(),
             'data_leaks': DataLeakMonitor(),
@@ -298,7 +298,7 @@ class TorMonitoringSystem:
     
     async def start_monitoring(self, config: Dict) -> None:
         """Start continuous monitoring"""
-        self.logger.info("Starting Tor monitoring system")
+        print("Starting Tor monitoring system")
         self.is_running = True
         
         # Start alert processor
@@ -326,7 +326,7 @@ class TorMonitoringSystem:
         
         while self.is_running:
             try:
-                self.logger.info(f"Running {monitor.name} check")
+                print(f"Running {monitor.name} check")
                 alerts = await monitor.check(monitor_config)
                 
                 for alert in alerts:
@@ -334,7 +334,7 @@ class TorMonitoringSystem:
                     self.alert_queue.put(alert)
                     
             except Exception as e:
-                self.logger.error(f"Error in {monitor.name}: {e}")
+                print(f"Error in {monitor.name}: {e}")
             
             await asyncio.sleep(interval)
     
@@ -345,21 +345,21 @@ class TorMonitoringSystem:
                 alert = self.alert_queue.get(timeout=1)
                 
                 # Log alert
-                self.logger.warning(f"ALERT [{alert['severity']}]: {alert['type']}")
+                print(f"ALERT [{alert['severity']}]: {alert['type']}")
                 
                 # Call handlers
                 for handler in self.alert_handlers:
                     try:
                         handler(alert)
                     except Exception as e:
-                        self.logger.error(f"Error in alert handler: {e}")
+                        print(f"Error in alert handler: {e}")
                         
             except queue.Empty:
                 continue
     
     def stop_monitoring(self) -> None:
         """Stop monitoring"""
-        self.logger.info("Stopping Tor monitoring system")
+        print("Stopping Tor monitoring system")
         self.is_running = False
         
         # Cancel all tasks
@@ -417,7 +417,7 @@ class AlertNotificationSystem:
     """Handle alert notifications"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.notification_methods = {
             'email': self._send_email,
             'webhook': self._send_webhook,
@@ -444,12 +444,12 @@ class AlertNotificationSystem:
                 try:
                     await self.notification_methods[channel](alert, config)
                 except Exception as e:
-                    self.logger.error(f"Failed to send alert via {channel}: {e}")
+                    print(f"Failed to send alert via {channel}: {e}")
     
     async def _send_email(self, alert: Dict, config: Dict) -> None:
         """Send email notification"""
         # Placeholder for email implementation
-        self.logger.info(f"Would send email alert: {alert['type']}")
+        print(f"Would send email alert: {alert['type']}")
     
     async def _send_webhook(self, alert: Dict, config: Dict) -> None:
         """Send webhook notification"""
@@ -478,7 +478,7 @@ class AlertNotificationSystem:
         }
         
         # Placeholder for SIEM integration
-        self.logger.info(f"Would send to SIEM: {siem_event}")
+        print(f"Would send to SIEM: {siem_event}")
     
     async def _send_slack(self, alert: Dict, config: Dict) -> None:
         """Send Slack notification"""

@@ -13,15 +13,15 @@ import hashlib
 import hmac
 from urllib.parse import urlencode
 
-from ....utils.logger import Logger
-from ....utils.config import Config
+
+from utils.config import Config
 
 
 class TorOSINTIntegrations:
     """Handle integrations with external threat intelligence and security platforms"""
     
     def __init__(self):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.config = Config()
         self.session = requests.Session()
         
@@ -45,7 +45,7 @@ class TorOSINTIntegrations:
         
         api_key = self.config.get('HIBP_API_KEY')
         if not api_key:
-            self.logger.warning("HIBP API key not configured")
+            print("HIBP API key not configured")
             return results
             
         try:
@@ -70,7 +70,7 @@ class TorOSINTIntegrations:
                     })
                     
         except Exception as e:
-            self.logger.error(f"Error checking HIBP: {e}")
+            print(f"Error checking HIBP: {e}")
             results['error'] = str(e)
             
         return results
@@ -88,7 +88,7 @@ class TorOSINTIntegrations:
         
         api_key = self.config.get('SHODAN_API_KEY')
         if not api_key:
-            self.logger.warning("Shodan API key not configured")
+            print("Shodan API key not configured")
             return results
             
         try:
@@ -116,7 +116,7 @@ class TorOSINTIntegrations:
                     })
                     
         except Exception as e:
-            self.logger.error(f"Error checking Shodan: {e}")
+            print(f"Error checking Shodan: {e}")
             results['error'] = str(e)
             
         return results
@@ -131,7 +131,7 @@ class TorOSINTIntegrations:
         
         api_key = self.config.get('PHISHTANK_API_KEY')
         if not api_key:
-            self.logger.info("PhishTank API key not configured, using public endpoint")
+            print("PhishTank API key not configured, using public endpoint")
             
         try:
             # Check if domain is being targeted by phishing
@@ -140,10 +140,10 @@ class TorOSINTIntegrations:
             
             # In production, you would check their database
             # For now, return empty results
-            self.logger.info(f"Checking PhishTank for domain: {domain}")
+            print(f"Checking PhishTank for domain: {domain}")
             
         except Exception as e:
-            self.logger.error(f"Error checking PhishTank: {e}")
+            print(f"Error checking PhishTank: {e}")
             results['error'] = str(e)
             
         return results
@@ -163,7 +163,7 @@ class TorOSINTIntegrations:
         misp_key = self.config.get('MISP_API_KEY')
         
         if not misp_url or not misp_key:
-            self.logger.info("MISP integration not configured")
+            print("MISP integration not configured")
             return results
             
         try:
@@ -197,12 +197,12 @@ class TorOSINTIntegrations:
                 event = response.json()
                 results['submitted'] = True
                 results['event_id'] = event.get('Event', {}).get('id')
-                self.logger.info(f"Successfully submitted to MISP: Event ID {results['event_id']}")
+                print(f"Successfully submitted to MISP: Event ID {results['event_id']}")
             else:
-                self.logger.error(f"MISP submission failed: {response.status_code}")
+                print(f"MISP submission failed: {response.status_code}")
                 
         except Exception as e:
-            self.logger.error(f"Error submitting to MISP: {e}")
+            print(f"Error submitting to MISP: {e}")
             results['error'] = str(e)
             
         return results
@@ -252,7 +252,7 @@ class TorOSINTIntegrations:
             return json.dumps(stix_bundle, indent=2)
             
         except Exception as e:
-            self.logger.error(f"Error generating STIX export: {e}")
+            print(f"Error generating STIX export: {e}")
             return "{}"
             
     def integrate_with_siem(self, findings: Dict) -> Dict:
@@ -270,7 +270,7 @@ class TorOSINTIntegrations:
         siem_token = self.config.get('SIEM_TOKEN')
         
         if not siem_endpoint:
-            self.logger.info("SIEM integration not configured")
+            print("SIEM integration not configured")
             return results
             
         try:
@@ -314,7 +314,7 @@ class TorOSINTIntegrations:
             results['sent'] = results['events_count'] > 0
             
         except Exception as e:
-            self.logger.error(f"Error sending to SIEM: {e}")
+            print(f"Error sending to SIEM: {e}")
             results['error'] = str(e)
             
         return results
@@ -333,7 +333,7 @@ class TorOSINTIntegrations:
         jira_project = self.config.get('JIRA_PROJECT', 'SEC')
         
         if not all([jira_url, jira_user, jira_token]):
-            self.logger.info("Jira integration not configured")
+            print("Jira integration not configured")
             return results
             
         try:
@@ -341,7 +341,7 @@ class TorOSINTIntegrations:
             risk_level = self._calculate_risk_level(findings)
             
             if risk_level not in ['High', 'Critical']:
-                self.logger.info(f"Risk level {risk_level} does not require Jira ticket")
+                print(f"Risk level {risk_level} does not require Jira ticket")
                 return results
                 
             # Create ticket
@@ -371,12 +371,12 @@ class TorOSINTIntegrations:
                 ticket = response.json()
                 results['ticket_created'] = True
                 results['ticket_key'] = ticket.get('key')
-                self.logger.info(f"Created Jira ticket: {results['ticket_key']}")
+                print(f"Created Jira ticket: {results['ticket_key']}")
             else:
-                self.logger.error(f"Failed to create Jira ticket: {response.status_code}")
+                print(f"Failed to create Jira ticket: {response.status_code}")
                 
         except Exception as e:
-            self.logger.error(f"Error creating Jira ticket: {e}")
+            print(f"Error creating Jira ticket: {e}")
             results['error'] = str(e)
             
         return results
@@ -390,7 +390,7 @@ class TorOSINTIntegrations:
         
         webhook_url = self.config.get('SLACK_WEBHOOK_URL')
         if not webhook_url:
-            self.logger.info("Slack integration not configured")
+            print("Slack integration not configured")
             return results
             
         try:
@@ -431,12 +431,12 @@ class TorOSINTIntegrations:
             
             if response.status_code == 200:
                 results['alert_sent'] = True
-                self.logger.info("Slack alert sent successfully")
+                print("Slack alert sent successfully")
             else:
-                self.logger.error(f"Failed to send Slack alert: {response.status_code}")
+                print(f"Failed to send Slack alert: {response.status_code}")
                 
         except Exception as e:
-            self.logger.error(f"Error sending Slack alert: {e}")
+            print(f"Error sending Slack alert: {e}")
             results['error'] = str(e)
             
         return results

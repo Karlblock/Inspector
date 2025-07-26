@@ -13,7 +13,7 @@ import asyncio
 from pathlib import Path
 import shutil
 
-from ....utils.logger import Logger
+
 
 
 class TorHoneypotSystem:
@@ -22,7 +22,7 @@ class TorHoneypotSystem:
     """
     
     def __init__(self, base_dir: str = "/var/lib/tor/honeypots"):
-        self.logger = Logger(__name__)
+        # Logger removed - using print statements
         self.base_dir = Path(base_dir)
         self.honeypots = {}
         self.monitoring_data = []
@@ -67,7 +67,7 @@ class TorHoneypotSystem:
         """
         Create a suite of honeypot hidden services
         """
-        self.logger.info(f"Creating honeypot suite for {organization}")
+        print(f"Creating honeypot suite for {organization}")
         
         if honeypot_types is None:
             honeypot_types = list(self.honeypot_templates.keys())
@@ -81,7 +81,7 @@ class TorHoneypotSystem:
         
         for hp_type in honeypot_types:
             if hp_type not in self.honeypot_templates:
-                self.logger.warning(f"Unknown honeypot type: {hp_type}")
+                print(f"Unknown honeypot type: {hp_type}")
                 continue
             
             template = self.honeypot_templates[hp_type]
@@ -104,7 +104,7 @@ class TorHoneypotSystem:
                 self.honeypots[hp_config['onion_address']] = hp_config
                 
             except Exception as e:
-                self.logger.error(f"Failed to create {hp_type} honeypot: {e}")
+                print(f"Failed to create {hp_type} honeypot: {e}")
                 deployment['honeypots'][hp_type] = {'error': str(e)}
         
         deployment['deployment_status'] = 'active'
@@ -537,7 +537,7 @@ HiddenServicePort 443 127.0.0.1:{self._get_free_port()}
                 'tor', '-f', str(torrc_path), '--quiet'
             ], check=True, capture_output=True)
         except subprocess.CalledProcessError as e:
-            self.logger.error(f"Failed to start hidden service: {e}")
+            print(f"Failed to start hidden service: {e}")
             raise
     
     def _wait_for_onion_address(self, hostname_path: Path, timeout: int = 60) -> str:
@@ -650,7 +650,7 @@ if __name__ == '__main__':
     def _initialize_monitoring(self, config: Dict) -> None:
         """Initialize monitoring for the honeypot"""
         # Set up log watchers, alert systems, etc.
-        self.logger.info(f"Monitoring initialized for {config['name']}")
+        print(f"Monitoring initialized for {config['name']}")
     
     def _save_deployment_config(self, deployment: Dict) -> None:
         """Save deployment configuration for persistence"""
@@ -672,7 +672,7 @@ if __name__ == '__main__':
                         for line in f:
                             try:
                                 alert = json.loads(line)
-                                self.logger.warning(f"ALERT: {alert['trigger']} on {address}")
+                                print(f"ALERT: {alert['trigger']} on {address}")
                                 
                                 if callback:
                                     callback(alert, config)
