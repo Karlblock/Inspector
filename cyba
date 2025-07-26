@@ -1,0 +1,79 @@
+#!/bin/bash
+# cyba - Smart wrapper for cyba-HTB
+
+# Get the directory where cyba-HTB is installed
+CYBA_DIR="$(dirname "$(readlink -f "$0")")"
+CYBA_SCRIPT="$CYBA_DIR/cyba-htb.py"
+
+# Function to show usage
+show_usage() {
+    echo "cyba - Smart HTB Enumeration Tool"
+    echo ""
+    echo "Quick usage:"
+    echo "  cyba <IP>                    # Auto-detect machine name from current directory"
+    echo "  cyba <IP> <NAME>            # Specify machine name"
+    echo "  cyba quick <IP>             # Quick scan"
+    echo "  cyba report                 # Generate report for last session"
+    echo "  cyba help                   # Show full help"
+    echo ""
+}
+
+# Check if no arguments
+if [ $# -eq 0 ]; then
+    show_usage
+    exit 1
+fi
+
+# Handle special commands
+case "$1" in
+    help|--help|-h)
+        python3 "$CYBA_SCRIPT" --help
+        ;;
+    quick)
+        if [ -z "$2" ]; then
+            echo "Error: IP address required for quick scan"
+            echo "Usage: cyba quick <IP>"
+            exit 1
+        fi
+        python3 "$CYBA_SCRIPT" quick -t "$2"
+        ;;
+    report)
+        # Find the most recent session in current directory
+        if [ -f ".last_session" ]; then
+            SESSION_ID=$(cat .last_session)
+            python3 "$CYBA_SCRIPT" report "$SESSION_ID" -f markdown
+        else
+            echo "No recent session found. Run an enumeration first."
+            python3 "$CYBA_SCRIPT" sessions list
+        fi
+        ;;
+    sessions|profiles)
+        # Pass through to cyba-htb
+        python3 "$CYBA_SCRIPT" "$@"
+        ;;
+    *)
+        # Assume first argument is IP for enumeration
+        if [[ "$1" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            IP="$1"
+            NAME="$2"
+            
+            # Build command
+            CMD="python3 $CYBA_SCRIPT enum -t $IP"
+            
+            # Add name if provided
+            if [ -n "$NAME" ]; then
+                CMD="$CMD -n $NAME"
+            fi
+            
+            # Execute
+            eval "$CMD"
+            
+            # Save session ID for quick report access
+            # This would need to be implemented in cyba-htb.py
+        else
+            echo "Error: Invalid IP address or command"
+            show_usage
+            exit 1
+        fi
+        ;;
+esac

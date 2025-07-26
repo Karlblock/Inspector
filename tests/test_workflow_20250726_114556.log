@@ -1,0 +1,21 @@
+======================================
+cyba-HTB Workflow Test Suite
+sam. 26 juil. 2025 11:45:56 CEST
+======================================
+
+[0;34mChecking prerequisites...[0m
+[0;32m✓ Python 3 found[0m
+[0;32m✓ Nmap found[0m
+[0;32m✓ Gobuster found[0m
+[1;33m⚠ Nikto not found (some tests will be skipped)[0m
+
+[0;34m=== SECTION 1: Python Environment ===[0m
+
+[0;34m[TEST 1] Python version check[0m
+Command: python3 --version | grep -E 'Python 3\.(8|9|10|11)'
+Python 3.11.2
+[0;32m✓ PASSED[0m
+
+[0;34m[TEST 2] Import test[0m
+Command: cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, "src"); from utils.colors import Colors; print("OK")' | grep OK
+OK
