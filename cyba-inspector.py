@@ -68,7 +68,7 @@ class CybaHTB:
         
         # Enumeration command
         enum_parser = subparsers.add_parser('enum', help='Start enumeration')
-        enum_parser.add_argument('-t', '--target', required=True, help='Target IP address')
+        enum_parser.add_argument('-t', '--target', required=True, help='Target IP address or domain name')
         enum_parser.add_argument('-n', '--name', help='Machine name (auto-detected from current dir if not provided)')
         enum_parser.add_argument('-p', '--profile', default='auto', 
                                 help='Enumeration profile (default: auto)')
@@ -81,7 +81,7 @@ class CybaHTB:
         
         # Quick scan command
         quick_parser = subparsers.add_parser('quick', help='Quick enumeration for CTF')
-        quick_parser.add_argument('-t', '--target', required=True, help='Target IP address')
+        quick_parser.add_argument('-t', '--target', required=True, help='Target IP address or domain name')
         quick_parser.add_argument('--top-ports', type=int, default=1000, 
                                  help='Number of top ports to scan (default: 1000)')
         quick_parser.set_defaults(func=self.quick_handler)
@@ -158,10 +158,24 @@ class CybaHTB:
     
     def enum_handler(self, args):
         """Handle enumeration command"""
-        # Validate IP address
-        if not InputValidator.validate_ip(args.target):
-            print(f"{Colors.RED}[-] Invalid IP address: {args.target}{Colors.END}")
+        # Validate target (IP or domain)
+        if not InputValidator.validate_target(args.target):
+            print(f"{Colors.RED}[-] Invalid target: {args.target} (must be IP address or domain name){Colors.END}")
             sys.exit(1)
+        
+        # Get IP and hostname
+        ip, hostname = InputValidator.get_target_info(args.target)
+        if not ip:
+            print(f"{Colors.RED}[-] Could not resolve {args.target} to an IP address{Colors.END}")
+            sys.exit(1)
+        
+        # Update target to resolved IP
+        original_target = args.target
+        args.target = ip
+        
+        # Show resolution info if domain was provided
+        if hostname and original_target != ip:
+            print(f"{Colors.GREEN}[+] Resolved {original_target} to {ip}{Colors.END}")
         
         # Validate ports if provided
         if args.ports and not InputValidator.validate_port(args.ports):
@@ -236,10 +250,24 @@ class CybaHTB:
     
     def quick_handler(self, args):
         """Handle quick scan command"""
-        # Validate IP address
-        if not InputValidator.validate_ip(args.target):
-            print(f"{Colors.RED}[-] Invalid IP address: {args.target}{Colors.END}")
+        # Validate target (IP or domain)
+        if not InputValidator.validate_target(args.target):
+            print(f"{Colors.RED}[-] Invalid target: {args.target} (must be IP address or domain name){Colors.END}")
             sys.exit(1)
+        
+        # Get IP and hostname
+        ip, hostname = InputValidator.get_target_info(args.target)
+        if not ip:
+            print(f"{Colors.RED}[-] Could not resolve {args.target} to an IP address{Colors.END}")
+            sys.exit(1)
+        
+        # Update target to resolved IP
+        original_target = args.target
+        args.target = ip
+        
+        # Show resolution info if domain was provided
+        if hostname and original_target != ip:
+            print(f"{Colors.GREEN}[+] Resolved {original_target} to {ip}{Colors.END}")
         
         print(f"{Colors.BLUE}[*] Starting quick scan for {args.target}{Colors.END}")
         
