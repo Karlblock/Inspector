@@ -1,5 +1,5 @@
 #!/bin/bash
-# Comprehensive workflow test for cyba-HTB
+# Comprehensive workflow test for cyba-Inspector
 # Tests installation, commands, error handling, and integration
 
 set -e
@@ -74,7 +74,7 @@ check_prerequisite() {
 }
 
 log "======================================"
-log "cyba-HTB Workflow Test Suite"
+log "cyba-Inspector Workflow Test Suite"
 log "$(date)"
 log "======================================"
 
@@ -88,32 +88,32 @@ HAS_NIKTO=$(check_prerequisite "nikto" "Nikto" && echo 1 || echo 0)
 # Test 1: Python environment
 log "\n${BLUE}=== SECTION 1: Python Environment ===${NC}"
 run_test "Python version check" "python3 --version | grep -E 'Python 3\.(8|9|10|11)'"
-run_test "Import test" "cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.colors import Colors; print(\"OK\")' | grep OK"
+run_test "Import test" "cd /home/user1/cyba-Inspector && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.colors import Colors; print(\"OK\")' | grep OK"
 
 # Test 2: Installation validation
 log "\n${BLUE}=== SECTION 2: Installation ===${NC}"
-run_test "Symlink exists" "test -L /usr/local/bin/cyba-htb"
-run_test "Symlink points to correct file" "readlink -f /usr/local/bin/cyba-htb | grep -q '/home/user1/cyba-HTB/cyba-htb.py'"
-run_test "Main script is executable" "test -x /home/user1/cyba-HTB/cyba-htb.py"
-run_test "Config directory exists" "test -d ~/.cyba-htb"
+run_test "Symlink exists" "test -L /usr/local/bin/cyba-inspector"
+run_test "Symlink points to correct file" "readlink -f /usr/local/bin/cyba-inspector | grep -q '/home/user1/cyba-Inspector/cyba-inspector.py'"
+run_test "Main script is executable" "test -x /home/user1/cyba-Inspector/cyba-inspector.py"
+run_test "Config directory exists" "test -d ~/.cyba-inspector"
 
 # Test 3: Basic commands
 log "\n${BLUE}=== SECTION 3: Basic Commands ===${NC}"
-run_test "Help command" "cyba-htb --help | grep -q 'Specialized enumeration tool'"
-run_test "Profiles list" "cyba-htb profiles list | grep -q 'linux-basic'"
-run_test "Sessions list" "cyba-htb sessions list"
+run_test "Help command" "cyba-inspector --help | grep -q 'Specialized enumeration tool'"
+run_test "Profiles list" "cyba-inspector profiles list | grep -q 'linux-basic'"
+run_test "Sessions list" "cyba-inspector sessions list"
 
 # Test 4: Input validation
 log "\n${BLUE}=== SECTION 4: Input Validation ===${NC}"
-run_test "Invalid IP rejection" "cyba-htb enum -t 999.999.999.999 -n test" 1
-run_test "Invalid port rejection" "cyba-htb enum -t 127.0.0.1 -n test --ports 99999" 1
-run_test "Invalid machine name rejection" "cyba-htb enum -t 127.0.0.1 -n 'test@machine'" 1
-run_test "Missing target rejection" "cyba-htb enum -n test" 2
+run_test "Invalid IP rejection" "cyba-inspector enum -t 999.999.999.999 -n test" 1
+run_test "Invalid port rejection" "cyba-inspector enum -t 127.0.0.1 -n test --ports 99999" 1
+run_test "Invalid machine name rejection" "cyba-inspector enum -t 127.0.0.1 -n 'test@machine'" 1
+run_test "Missing target rejection" "cyba-inspector enum -n test" 2
 
 # Test 5: Quick scan simulation
 log "\n${BLUE}=== SECTION 5: Quick Scan ===${NC}"
 if [ $HAS_NIKTO -eq 1 ]; then
-    run_test "Quick scan localhost" "timeout 10 cyba-htb quick -t 127.0.0.1 || true"
+    run_test "Quick scan localhost" "timeout 10 cyba-inspector quick -t 127.0.0.1 || true"
 else
     log "${YELLOW}⚠ Skipping quick scan test (nikto not installed)${NC}"
     SKIPPED=$((SKIPPED + 1))
@@ -121,28 +121,28 @@ fi
 
 # Test 6: Python validators
 log "\n${BLUE}=== SECTION 6: Validator Tests ===${NC}"
-run_test "Run validator tests" "cd /home/user1/cyba-HTB && python3 tests/test_validators.py | grep -q 'All tests passed'"
+run_test "Run validator tests" "cd /home/user1/cyba-Inspector && python3 tests/test_validators.py | grep -q 'All tests passed'"
 
 # Test 7: Module imports
 log "\n${BLUE}=== SECTION 7: Module Integration ===${NC}"
-run_test "Import enumeration modules" "cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, \"src\"); from enumeration.modules import nmap, web, smb, ssh, ftp; print(\"OK\")' | grep OK"
-run_test "Import reporting modules" "cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, \"src\"); from reporting.generator import ReportGenerator; print(\"OK\")' | grep OK"
-run_test "Import utilities" "cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.config import config; from utils.validators import InputValidator; print(\"OK\")' | grep OK"
+run_test "Import enumeration modules" "cd /home/user1/cyba-Inspector && python3 -c 'import sys; sys.path.insert(0, \"src\"); from enumeration.modules import nmap, web, smb, ssh, ftp; print(\"OK\")' | grep OK"
+run_test "Import reporting modules" "cd /home/user1/cyba-Inspector && python3 -c 'import sys; sys.path.insert(0, \"src\"); from reporting.generator import ReportGenerator; print(\"OK\")' | grep OK"
+run_test "Import utilities" "cd /home/user1/cyba-Inspector && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.config import config; from utils.validators import InputValidator; print(\"OK\")' | grep OK"
 
 # Test 8: Configuration system
 log "\n${BLUE}=== SECTION 8: Configuration ===${NC}"
-run_test "Config file creation" "cd /home/user1/cyba-HTB && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.config import Config; c = Config(); print(\"OK\")' | grep OK"
+run_test "Config file creation" "cd /home/user1/cyba-Inspector && python3 -c 'import sys; sys.path.insert(0, \"src\"); from utils.config import Config; c = Config(); print(\"OK\")' | grep OK"
 run_test "Environment variable handling" "CYBA_TIMEOUT_SHORT=60 python3 -c 'import os; print(os.getenv(\"CYBA_TIMEOUT_SHORT\"))' | grep 60"
 
 # Test 9: Error handling
 log "\n${BLUE}=== SECTION 9: Error Handling ===${NC}"
-run_test "Graceful error on invalid session" "cyba-htb report invalid_session_id" 1
-run_test "Graceful error on invalid profile" "cyba-htb profiles show invalid_profile" 1
+run_test "Graceful error on invalid session" "cyba-inspector report invalid_session_id" 1
+run_test "Graceful error on invalid profile" "cyba-inspector profiles show invalid_profile" 1
 
 # Test 10: Security checks
 log "\n${BLUE}=== SECTION 10: Security ===${NC}"
-run_test "No hardcoded API keys" "! grep -r 'api_key.*=.*[a-zA-Z0-9]\\{20,\\}' /home/user1/cyba-HTB/src --include='*.py' | grep -v example"
-run_test "No hardcoded passwords" "! grep -r 'password.*=.*[\"'\''][^\"'\'']*[\"'\'']' /home/user1/cyba-HTB/src --include='*.py' | grep -v example"
+run_test "No hardcoded API keys" "! grep -r 'api_key.*=.*[a-zA-Z0-9]\\{20,\\}' /home/user1/cyba-Inspector/src --include='*.py' | grep -v example"
+run_test "No hardcoded passwords" "! grep -r 'password.*=.*[\"'\''][^\"'\'']*[\"'\'']' /home/user1/cyba-Inspector/src --include='*.py' | grep -v example"
 
 # Summary
 log "\n${BLUE}======================================"

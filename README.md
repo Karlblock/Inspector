@@ -1,4 +1,4 @@
-# cyba-HTB - CLI Tool for HTB Enumeration & Analysis
+# cyba-Inspector - CLI Tool for HTB Enumeration & Analysis
 
 A specialized CLI tool designed for Hack The Box enumeration, analysis, and reporting. This tool provides structured enumeration workflows based on machine types and services.
 
@@ -10,14 +10,16 @@ A specialized CLI tool designed for Hack The Box enumeration, analysis, and repo
 - 🛠️ **Extensible Modules**: Easy to add new enumeration techniques
 - 📝 **Note Management**: Integrated note-taking during enumeration
 - 🔄 **Session Management**: Save and resume enumeration sessions
+- 🌐 **Tor OSINT Module**: Defensive dark web research for threat intelligence
+- 🛡️ **Security Focused**: Built-in protections and compliance checks
 
 ## Installation
 
 ```bash
-cd /home/user1/HTB/cyba-HTB
-chmod +x cyba-htb.py
+cd /home/user1/HTB/cyba-Inspector
+chmod +x cyba-inspector.py
 # Optional: Create symlink for global access
-sudo ln -s $(pwd)/cyba-htb.py /usr/local/bin/cyba-htb
+sudo ln -s $(pwd)/cyba-inspector.py /usr/local/bin/cyba-inspector
 ```
 
 ## Usage
@@ -26,19 +28,19 @@ sudo ln -s $(pwd)/cyba-htb.py /usr/local/bin/cyba-htb
 
 ```bash
 # Start new enumeration
-cyba-htb enum -t <target_ip> -n <machine_name>
+cyba-inspector enum -t <target_ip> -n <machine_name>
 
 # Use specific profile
-cyba-htb enum -t <target_ip> -p windows-ad
+cyba-inspector enum -t <target_ip> -p windows-ad
 
 # Resume previous session
-cyba-htb resume <session_id>
+cyba-inspector resume <session_id>
 
 # Generate report
-cyba-htb report <session_id> -f markdown
+cyba-inspector report <session_id> -f markdown
 
 # List available profiles
-cyba-htb profiles list
+cyba-inspector profiles list
 ```
 
 ### Enumeration Profiles
@@ -54,23 +56,28 @@ cyba-htb profiles list
 
 ```bash
 # Full enumeration with auto-detection
-cyba-htb enum -t 10.10.10.100 -n "Cronos" --auto-detect
+cyba-inspector enum -t 10.10.10.100 -n "Cronos" --auto-detect
 
 # Web-focused enumeration
-cyba-htb enum -t 10.10.10.100 -p web-app --ports 80,443,8080
+cyba-inspector enum -t 10.10.10.100 -p web-app --ports 80,443,8080
 
 # Quick scan for CTF
-cyba-htb quick -t 10.10.10.100
+cyba-inspector quick -t 10.10.10.100
 
 # Export findings to different formats
-cyba-htb report session_123 -f json -o findings.json
-cyba-htb report session_123 -f html -o report.html
+cyba-inspector report session_123 -f json -o findings.json
+cyba-inspector report session_123 -f html -o report.html
+
+# Tor/Dark Web OSINT (defensive security research)
+cyba-inspector tor-osint -t example.com --use-tor
+cyba-inspector tor-osint -t example.com --check-hibp --check-shodan
+cyba-inspector tor-osint -t example.com --executive-report --include-opsec
 ```
 
 ## Architecture
 
 ```
-cyba-HTB/
+cyba-Inspector/
 ├── src/
 │   ├── enumeration/     # Enumeration modules
 │   ├── exploitation/    # Exploitation helpers

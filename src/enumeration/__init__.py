@@ -1,1 +1,1 @@
-# Enumeration modules for cyba-HTB
+# Enumeration modules for cyba-Inspector

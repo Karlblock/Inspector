@@ -1,5 +1,5 @@
 """
-Report generator for cyba-HTB
+Report generator for cyba-Inspector
 """
 
 import json
@@ -146,9 +146,9 @@ class ReportGenerator:
         report += "## Quick Commands Reference\n\n"
         report += "```bash\n"
         report += f"# Resume this session\n"
-        report += f"cyba-htb resume {session['id']}\n\n"
+        report += f"cyba-inspector resume {session['id']}\n\n"
         report += f"# Generate updated report\n"
-        report += f"cyba-htb report {session['id']} -f markdown -o {session['name']}_enum_updated.md\n"
+        report += f"cyba-inspector report {session['id']} -f markdown -o {session['name']}_enum_updated.md\n"
         report += "```\n"
         
         return report

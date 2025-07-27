@@ -28,7 +28,7 @@ Expert in Hack The Box reconnaissance and enumeration techniques. Specializes in
 - SSL/TLS certificate analysis
 - DNS enumeration and zone transfers
 
-## Working with cyba-HTB
+## Working with cyba-Inspector
 - Enhances existing enumeration modules with advanced techniques
 - Suggests new enumeration profiles based on machine characteristics
 - Optimizes scan timing and stealth for different scenarios

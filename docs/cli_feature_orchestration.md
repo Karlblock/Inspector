@@ -1,7 +1,7 @@
 # 🎭 Orchestrator Mission: Interactive CLI Feature
 
 ## Mission Brief
-**Objective**: Create an interactive CLI mode for cyba-HTB
+**Objective**: Create an interactive CLI mode for cyba-Inspector
 **Complexity**: Medium-High
 **Agents Required**: 4 specialists + orchestrator
 
@@ -32,7 +32,7 @@ Agent Assignment:
 
 class InteractiveCLI:
     """
-    Enhanced interactive mode for cyba-HTB
+    Enhanced interactive mode for cyba-Inspector
     Uses cmd2 for advanced features
     """
     
@@ -74,15 +74,15 @@ from rich.progress import track
 import asyncio
 
 class CybaHTBShell(cmd2.Cmd):
-    """Interactive shell for cyba-HTB"""
+    """Interactive shell for cyba-Inspector"""
     
     intro = """
     ╔═══════════════════════════════════════╗
-    ║       cyba-HTB Interactive Mode       ║
+    ║       cyba-Inspector Interactive Mode       ║
     ║     Type 'help' for commands          ║
     ╚═══════════════════════════════════════╝
     """
-    prompt = "cyba-htb> "
+    prompt = "cyba-inspector> "
     
     def __init__(self):
         super().__init__()

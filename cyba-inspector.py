@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-cyba-HTB - CLI Tool for HTB Enumeration & Analysis
+cyba-Inspector - CLI Tool for HTB Enumeration & Analysis
 Author: Karl Block
 Version: 1.0.0
 Developed for educational purposes and CPTS preparation
@@ -39,9 +39,15 @@ class CybaHTB:
     def main(self):
         # Check if interactive mode requested
         if len(sys.argv) > 1 and sys.argv[1] == 'interactive':
-            from cli.interactive import main as interactive_main
-            interactive_main()
-            return
+            try:
+                from src.cli.interactive import main as interactive_main
+                interactive_main()
+                return
+            except ImportError:
+                # Try alternate import path
+                from cli.interactive import main as interactive_main
+                interactive_main()
+                return
             
         display_banner()
         parser = self.create_parser()
@@ -54,7 +60,7 @@ class CybaHTB:
     
     def create_parser(self):
         parser = argparse.ArgumentParser(
-            description='cyba-HTB - Specialized enumeration tool for Hack The Box',
+            description='cyba-Inspector - Specialized enumeration tool for Hack The Box',
             formatter_class=argparse.RawDescriptionHelpFormatter
         )
         
@@ -62,7 +68,7 @@ class CybaHTB:
         
         # Enumeration command
         enum_parser = subparsers.add_parser('enum', help='Start enumeration')
-        enum_parser.add_argument('-t', '--target', required=True, help='Target IP address')
+        enum_parser.add_argument('-t', '--target', required=True, help='Target IP address or domain name')
         enum_parser.add_argument('-n', '--name', help='Machine name (auto-detected from current dir if not provided)')
         enum_parser.add_argument('-p', '--profile', default='auto', 
                                 help='Enumeration profile (default: auto)')
@@ -75,7 +81,7 @@ class CybaHTB:
         
         # Quick scan command
         quick_parser = subparsers.add_parser('quick', help='Quick enumeration for CTF')
-        quick_parser.add_argument('-t', '--target', required=True, help='Target IP address')
+        quick_parser.add_argument('-t', '--target', required=True, help='Target IP address or domain name')
         quick_parser.add_argument('--top-ports', type=int, default=1000, 
                                  help='Number of top ports to scan (default: 1000)')
         quick_parser.set_defaults(func=self.quick_handler)
@@ -121,14 +127,55 @@ class CybaHTB:
         question_parser.add_argument('--list', action='store_true', help='List all available questions')
         question_parser.set_defaults(func=self.question_handler)
         
+        # Tor OSINT command
+        tor_parser = subparsers.add_parser('tor-osint', help='Tor/Dark Web OSINT for defensive security')
+        tor_parser.add_argument('-t', '--target', required=True, help='Target domain to research')
+        tor_parser.add_argument('-k', '--keywords', nargs='+', 
+                               default=['password', 'leak', 'breach', 'database'],
+                               help='Keywords to search for (default: password leak breach database)')
+        tor_parser.add_argument('--use-tor', action='store_true', 
+                               help='Enable Tor for anonymous research')
+        tor_parser.add_argument('--check-hibp', action='store_true',
+                               help='Check Have I Been Pwned for breaches')
+        tor_parser.add_argument('--check-shodan', action='store_true',
+                               help='Check Shodan for exposed services')
+        tor_parser.add_argument('--report-format', choices=['markdown', 'html', 'json', 'executive'],
+                               default='markdown', help='Report format (default: markdown)')
+        tor_parser.add_argument('--executive-report', action='store_true',
+                               help='Also generate executive summary')
+        tor_parser.add_argument('--include-opsec', action='store_true',
+                               help='Include OPSEC guidelines in output')
+        tor_parser.add_argument('--slack-alerts', action='store_true',
+                               help='Send Slack alerts for high-risk findings')
+        tor_parser.add_argument('--create-tickets', action='store_true',
+                               help='Create Jira tickets for critical findings')
+        tor_parser.add_argument('--export-stix', action='store_true',
+                               help='Export findings in STIX format')
+        tor_parser.add_argument('-o', '--output', help='Output directory (default: current)')
+        tor_parser.set_defaults(func=self.tor_osint_handler)
+        
         return parser
     
     def enum_handler(self, args):
         """Handle enumeration command"""
-        # Validate IP address
-        if not InputValidator.validate_ip(args.target):
-            print(f"{Colors.RED}[-] Invalid IP address: {args.target}{Colors.END}")
+        # Validate target (IP or domain)
+        if not InputValidator.validate_target(args.target):
+            print(f"{Colors.RED}[-] Invalid target: {args.target} (must be IP address or domain name){Colors.END}")
             sys.exit(1)
+        
+        # Get IP and hostname
+        ip, hostname = InputValidator.get_target_info(args.target)
+        if not ip:
+            print(f"{Colors.RED}[-] Could not resolve {args.target} to an IP address{Colors.END}")
+            sys.exit(1)
+        
+        # Update target to resolved IP
+        original_target = args.target
+        args.target = ip
+        
+        # Show resolution info if domain was provided
+        if hostname and original_target != ip:
+            print(f"{Colors.GREEN}[+] Resolved {original_target} to {ip}{Colors.END}")
         
         # Validate ports if provided
         if args.ports and not InputValidator.validate_port(args.ports):
@@ -203,10 +250,24 @@ class CybaHTB:
     
     def quick_handler(self, args):
         """Handle quick scan command"""
-        # Validate IP address
-        if not InputValidator.validate_ip(args.target):
-            print(f"{Colors.RED}[-] Invalid IP address: {args.target}{Colors.END}")
+        # Validate target (IP or domain)
+        if not InputValidator.validate_target(args.target):
+            print(f"{Colors.RED}[-] Invalid target: {args.target} (must be IP address or domain name){Colors.END}")
             sys.exit(1)
+        
+        # Get IP and hostname
+        ip, hostname = InputValidator.get_target_info(args.target)
+        if not ip:
+            print(f"{Colors.RED}[-] Could not resolve {args.target} to an IP address{Colors.END}")
+            sys.exit(1)
+        
+        # Update target to resolved IP
+        original_target = args.target
+        args.target = ip
+        
+        # Show resolution info if domain was provided
+        if hostname and original_target != ip:
+            print(f"{Colors.GREEN}[+] Resolved {original_target} to {ip}{Colors.END}")
         
         print(f"{Colors.BLUE}[*] Starting quick scan for {args.target}{Colors.END}")
         
@@ -328,8 +389,8 @@ class CybaHTB:
         
         if not args.query:
             print(f"{Colors.YELLOW}Usage:{Colors.END}")
-            print("  cyba-htb question 'admin id'")
-            print("  cyba-htb question --list")
+            print("  cyba-inspector question 'admin id'")
+            print("  cyba-inspector question --list")
             print("\nTry searching for a keyword from the HTB question.")
             return
         
@@ -338,9 +399,9 @@ class CybaHTB:
         
         if not matches:
             print(f"{Colors.RED}No questions found matching '{args.query}'{Colors.END}")
-            print(f"\n{Colors.YELLOW}Tip:{Colors.END} Use 'cyba-htb question --list' to see all available questions")
+            print(f"\n{Colors.YELLOW}Tip:{Colors.END} Use 'cyba-inspector question --list' to see all available questions")
             return
-        
+            
         if len(matches) == 1:
             # Show the single match
             self.htb_questions.display_help(matches[0][0])
@@ -352,6 +413,103 @@ class CybaHTB:
             
             print(f"\n{Colors.YELLOW}Showing first match:{Colors.END}")
             self.htb_questions.display_help(matches[0][0])
+            
+    def tor_osint_handler(self, args):
+        """Handle Tor OSINT command"""
+        from enumeration.modules import tor_osint as tor_osint_module
+        
+        # Validate domain
+        if not InputValidator.validate_domain(args.target):
+            print(f"{Colors.RED}[-] Invalid domain: {args.target}{Colors.END}")
+            sys.exit(1)
+            
+        print(f"{Colors.BLUE}[*] Starting Tor OSINT research for {args.target}{Colors.END}")
+        print(f"{Colors.YELLOW}[!] This is for defensive security research only{Colors.END}")
+        print(f"{Colors.YELLOW}[!] Ensure you have authorization for the target domain{Colors.END}")
+        
+        # Set output directory
+        output_dir = args.output or os.getcwd()
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Create a session for tracking
+        session_id = self.session_manager.create_session(
+            target=args.target,
+            name=f"tor_osint_{args.target.replace('.', '_')}",
+            profile='tor_osint'
+        )
+        
+        # Initialize module
+        tor_module = tor_osint_module.module
+        
+        # Prepare kwargs
+        kwargs = {
+            'keywords': args.keywords,
+            'use_tor': args.use_tor,
+            'check_hibp': args.check_hibp,
+            'check_shodan': args.check_shodan,
+            'report_format': args.report_format,
+            'generate_executive_report': args.executive_report,
+            'include_opsec': args.include_opsec,
+            'include_recommendations': True,
+            'slack_alerts': args.slack_alerts,
+            'create_tickets': args.create_tickets,
+            'export_stix': args.export_stix,
+            'send_to_siem': False  # Can be enabled via config
+        }
+        
+        # Run the module
+        try:
+            results = tor_module.run(args.target, session_id, output_dir, **kwargs)
+            
+            # Display results summary
+            if 'error' in results:
+                print(f"{Colors.RED}[-] Error: {results['error']}{Colors.END}")
+            else:
+                findings = results.get('findings', {})
+                summary = findings.get('summary', {})
+                
+                print(f"\n{Colors.GREEN}[+] Tor OSINT scan completed{Colors.END}")
+                print(f"{Colors.BLUE}[*] Risk Level: {summary.get('risk_level', 'Unknown')}{Colors.END}")
+                print(f"{Colors.BLUE}[*] Data Leaks Found: {summary.get('data_leaks_found', 0)}{Colors.END}")
+                print(f"{Colors.BLUE}[*] Threats Detected: {summary.get('threats_detected', 0)}{Colors.END}")
+                
+                if results.get('tor_enabled'):
+                    print(f"{Colors.GREEN}[+] Tor was used (Exit IP: {results.get('tor_exit_ip', 'Unknown')}){Colors.END}")
+                else:
+                    print(f"{Colors.YELLOW}[!] Tor was not used (clearnet only){Colors.END}")
+                    
+                # Display report locations
+                if results.get('report_path'):
+                    print(f"\n{Colors.GREEN}[+] Main report: {results['report_path']}{Colors.END}")
+                if results.get('executive_report_path'):
+                    print(f"{Colors.GREEN}[+] Executive report: {results['executive_report_path']}{Colors.END}")
+                if results.get('safety_report_path'):
+                    print(f"{Colors.GREEN}[+] Safety report: {results['safety_report_path']}{Colors.END}")
+                if results.get('opsec_guide_path'):
+                    print(f"{Colors.GREEN}[+] OPSEC guide: {results['opsec_guide_path']}{Colors.END}")
+                if results.get('stix_export_path'):
+                    print(f"{Colors.GREEN}[+] STIX export: {results['stix_export_path']}{Colors.END}")
+                    
+                # Display integration results
+                integrations = results.get('integrations', {})
+                if integrations:
+                    print(f"\n{Colors.BLUE}[*] Integration Results:{Colors.END}")
+                    if 'slack' in integrations and integrations['slack'].get('alert_sent'):
+                        print(f"{Colors.GREEN}[+] Slack alert sent{Colors.END}")
+                    if 'jira' in integrations and integrations['jira'].get('ticket_created'):
+                        print(f"{Colors.GREEN}[+] Jira ticket created: {integrations['jira']['ticket_key']}{Colors.END}")
+                    if 'siem' in integrations and integrations['siem'].get('sent'):
+                        print(f"{Colors.GREEN}[+] SIEM events sent: {integrations['siem']['events_count']}{Colors.END}")
+                
+                # Update session with results
+                self.session_manager.update_session(session_id, {'tor_osint': results})
+                
+        except Exception as e:
+            print(f"{Colors.RED}[-] Error during Tor OSINT research: {e}{Colors.END}")
+            sys.exit(1)
+        finally:
+            # Cleanup
+            tor_module.cleanup()
 
 if __name__ == '__main__':
     app = CybaHTB()

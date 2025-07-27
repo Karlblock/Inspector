@@ -1,5 +1,5 @@
 """
-Banner display for cyba-HTB
+Banner display for cyba-Inspector
 """
 
 from utils.colors import Colors

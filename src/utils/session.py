@@ -1,5 +1,5 @@
 """
-Session management for cyba-HTB
+Session management for cyba-Inspector
 """
 
 import json
@@ -10,7 +10,7 @@ import uuid
 
 class SessionManager:
     def __init__(self):
-        self.sessions_dir = Path.home() / '.cyba-htb' / 'sessions'
+        self.sessions_dir = Path.home() / '.cyba-inspector' / 'sessions'
         self.sessions_dir.mkdir(parents=True, exist_ok=True)
         
     def create_session(self, target, name, profile='auto'):

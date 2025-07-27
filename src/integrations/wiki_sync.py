@@ -1,5 +1,5 @@
 """
-HTB Wiki integration for cyba-HTB
+HTB Wiki integration for cyba-Inspector
 """
 
 import requests

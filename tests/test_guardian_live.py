@@ -63,7 +63,7 @@ def test_good_practices():
     api_key = os.environ.get("CYBA_API_KEY")
     
     # ✅ Path validation
-    safe_path = Path("/tmp/cyba-htb") / "results.txt"
+    safe_path = Path("/tmp/cyba-inspector") / "results.txt"
     if safe_path.exists() and safe_path.is_file():
         with open(safe_path, 'r') as f:
             content = f.read()

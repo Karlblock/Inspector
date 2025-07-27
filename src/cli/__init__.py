@@ -1,5 +1,5 @@
 """
-Interactive CLI module for cyba-HTB
+Interactive CLI module for cyba-Inspector
 Provides an enhanced shell interface with auto-completion and real-time feedback
 """
 
