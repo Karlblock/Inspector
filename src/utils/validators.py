@@ -7,6 +7,7 @@ import re
 import ipaddress
 import shlex
 from pathlib import Path
+import socket
 
 class InputValidator:
     """Validate and sanitize user inputs"""
@@ -130,3 +131,44 @@ class InputValidator:
                 return False
                 
         return True
+    
+    @staticmethod
+    def validate_target(target):
+        """Validate target - can be IP address or domain name"""
+        # First try as IP
+        if InputValidator.validate_ip(target):
+            return True
+        # Then try as domain
+        return InputValidator.validate_domain(target)
+    
+    @staticmethod
+    def resolve_domain(domain):
+        """Resolve domain to IP address"""
+        try:
+            # Get the first IP address
+            ip = socket.gethostbyname(domain)
+            return ip
+        except socket.gaierror:
+            return None
+    
+    @staticmethod
+    def get_target_info(target):
+        """Get target information - returns (ip, hostname)"""
+        # Check if it's an IP
+        if InputValidator.validate_ip(target):
+            try:
+                # Try reverse lookup
+                hostname = socket.gethostbyaddr(target)[0]
+                return target, hostname
+            except:
+                return target, None
+        
+        # Check if it's a domain
+        elif InputValidator.validate_domain(target):
+            ip = InputValidator.resolve_domain(target)
+            if ip:
+                return ip, target
+            else:
+                return None, target
+        
+        return None, None
