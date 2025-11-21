@@ -106,8 +106,8 @@ class EnumerationController:
         """Quick enumeration for CTF"""
         print(f"{Colors.BLUE}[*] Running quick enumeration...{Colors.END}")
 
-        # Quick nmap scan - save to rapports directory
-        output_dir = Path(os.getcwd()) / 'rapports' / f"quick_{target.replace('.', '_')}"
+        # Quick nmap scan - save to reports directory
+        output_dir = Path(os.getcwd()) / 'reports' / f"quick_{target.replace('.', '_')}"
         output_dir.mkdir(parents=True, exist_ok=True)
         print(f"{Colors.BLUE}[*] Output directory: {output_dir}{Colors.END}")
         

@@ -66,9 +66,9 @@ env/
 # cyba-HTB specific
 .last_session
 sessions/
-rapports/*
-!rapports/README.md
-!rapports/.gitignore
+reports/*
+!reports/README.md
+!reports/.gitignore
 *.json
 nmap_*.xml
 nmap_*.gnmap

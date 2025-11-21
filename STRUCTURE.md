@@ -57,7 +57,7 @@ cyba-Inspector/
 │   ├── guardian_check.py
 │   └── README.md
 │
-├── rapports/                    # Scan outputs (gitignored)
+├── reports/                     # Scan outputs (gitignored)
 │   ├── <machine_name>/         # Per-machine reports
 │   │   ├── nmap_*.xml
 │   │   ├── ldap_*.txt
@@ -106,7 +106,7 @@ Utility scripts organized by purpose:
 - `setup/` - Installation and configuration
 - `migration/` - Legacy migration tools
 
-### Rapports (`rapports/`)
+### Reports (`reports/`)
 All scan outputs and reports. Automatically created per target.
 This directory is gitignored except for README and .gitignore.
 
@@ -122,23 +122,23 @@ Comprehensive documentation for all features.
 - `src/enumeration/controller.py` - Core enumeration logic
 - `src/enumeration/modules/base.py` - Module base class
 - `src/utils/validators.py` - Security validation
-- `rapports/` - All scan outputs (gitignored)
+- `reports/` - All scan outputs (gitignored)
 
 ## Data Flow
 
 1. User runs: `cyba-inspector enum -t <IP> -n <name>`
 2. Main script creates session in `~/.cyba-inspector/sessions/`
 3. Controller loads appropriate profile
-4. Modules execute and save to `rapports/<name>/`
+4. Modules execute and save to `reports/<name>/`
 5. Report generator creates markdown summary
 6. Session saved for resume capability
 
 ## Output Locations
 
-- Scan outputs: `rapports/<machine_name>/`
+- Scan outputs: `reports/<machine_name>/`
 - Session data: `~/.cyba-inspector/sessions/`
 - Logs: `.last_session`
-- Reports: `rapports/<machine_name>/<machine>_enum.md`
+- Reports: `reports/<machine_name>/<machine>_enum.md`
 
 ## Installation Locations
 
