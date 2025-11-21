@@ -1,0 +1,5 @@
+# Ignore all scan outputs
+*
+
+# But keep this directory
+!.gitignore

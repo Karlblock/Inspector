@@ -66,6 +66,9 @@ env/
 # cyba-HTB specific
 .last_session
 sessions/
+rapports/*
+!rapports/README.md
+!rapports/.gitignore
 *.json
 nmap_*.xml
 nmap_*.gnmap
@@ -74,6 +77,9 @@ results/
 output/
 logs/
 *.log
+*.txt
+!requirements.txt
+!GIT_COMMIT_MESSAGE.txt
 
 # Sensitive data
 .env

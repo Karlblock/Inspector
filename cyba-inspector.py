@@ -200,10 +200,13 @@ class CybaHTB:
             sys.exit(1)
         
         print(f"{Colors.BLUE}[*] Starting enumeration for {args.name} ({args.target}){Colors.END}")
-        
-        # Set output directory to current directory if not specified
+
+        # Set output directory to rapports/ subdirectory if not specified
         if not args.output:
-            args.output = os.getcwd()
+            rapports_dir = os.path.join(os.getcwd(), 'rapports', args.name)
+            os.makedirs(rapports_dir, exist_ok=True)
+            args.output = rapports_dir
+            print(f"{Colors.BLUE}[*] Output directory: {rapports_dir}{Colors.END}")
         
         # Create session
         session_id = self.session_manager.create_session(

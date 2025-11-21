@@ -9,7 +9,7 @@ from datetime import datetime
 from utils.colors import Colors
 from utils.session import SessionManager
 from enumeration.profiles import EnumerationProfiles
-from enumeration.modules import nmap, web, smb, ssh, ftp
+from enumeration.modules import nmap, web, smb, ssh, ftp, ldap, rdp, dns
 
 class EnumerationController:
     def __init__(self):
@@ -20,7 +20,10 @@ class EnumerationController:
             'web': web.WebModule(),
             'smb': smb.SMBModule(),
             'ssh': ssh.SSHModule(),
-            'ftp': ftp.FTPModule()
+            'ftp': ftp.FTPModule(),
+            'ldap': ldap.LDAPModule(),
+            'rdp': rdp.RDPModule(),
+            'dns': dns.DNSModule()
         }
         
     def start_enumeration(self, session_id, target, name, profile='auto', 
@@ -102,10 +105,11 @@ class EnumerationController:
     def quick_enumeration(self, session_id, target, top_ports=1000):
         """Quick enumeration for CTF"""
         print(f"{Colors.BLUE}[*] Running quick enumeration...{Colors.END}")
-        
-        # Quick nmap scan
-        output_dir = Path.home() / 'HTB' / 'quick_scans' / target
+
+        # Quick nmap scan - save to rapports directory
+        output_dir = Path(os.getcwd()) / 'rapports' / f"quick_{target.replace('.', '_')}"
         output_dir.mkdir(parents=True, exist_ok=True)
+        print(f"{Colors.BLUE}[*] Output directory: {output_dir}{Colors.END}")
         
         # Run only essential modules
         quick_modules = ['nmap', 'web']
